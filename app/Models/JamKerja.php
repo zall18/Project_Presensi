@@ -9,8 +9,10 @@ class JamKerja extends Model
 {
     use HasFactory;
 
+    protected $guarded = [];
+
     public function shift()
     {
-        return $this->hasOne(Shift::class);
+        return $this->hasMany(Shift::class, 'id_jam_kerja');
     }
 }

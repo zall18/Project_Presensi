@@ -12,7 +12,7 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // \App\Models\User::factory(10)->create();
+        \App\Models\User::factory(10)->create();
 
         // \App\Models\User::factory()->create([
         //     'name' => 'Test User',
@@ -60,7 +60,7 @@ class DatabaseSeeder extends Seeder
         $liburs = \App\Models\WaktuLibur::factory(2)->create();
 
         foreach ($liburs as $libur) {
-            \App\Models\GrupLibur::factory()->create([
+            \App\Models\GroupLibur::factory()->create([
                 'id_waktu_libur' => $libur->id,
                 'id_group' => $groups->random()->id,
             ]);

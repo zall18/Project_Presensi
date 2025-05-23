@@ -9,8 +9,10 @@ class Shift extends Model
 {
     use HasFactory;
 
-    public function jam_kerja() {
-        return $this->belongsTo(JamKerja::class);
+    protected $guarded = [];
+
+    public function jamKerja() {
+        return $this->belongsTo(JamKerja::class, 'id_jam_kerja');
     }
 
     public function detail_shift() {
@@ -18,7 +20,7 @@ class Shift extends Model
     }
 
     public function jadwal_participant() {
-        return $this->belongsToMany(JadwalParticipant::class);
+        return $this->hasMany(JadwalParticipant::class, 'id_shift');
     }
 
     public function presensi() {

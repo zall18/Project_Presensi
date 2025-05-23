@@ -5,9 +5,9 @@ namespace Database\Factories;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\GrupLibur>
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\GroupLibur>
  */
-class GrupLiburFactory extends Factory
+class GroupLiburFactory extends Factory
 {
     /**
      * Define the model's default state.

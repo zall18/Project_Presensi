@@ -9,6 +9,8 @@ class Participant extends Model
 {
     use HasFactory;
 
+    protected $guarded = [];
+
     public function groups()
     {
         return $this->belongsToMany(Group::class, 'group_participants', 'id_participant', 'id_group');
@@ -17,5 +19,10 @@ class Participant extends Model
     public function jadwalParticipant()
     {
         return $this->belongsToMany(JadwalParticipant::class);
+    }
+
+    public function groupParticipants()
+    {
+        return $this->hasMany(GroupParticipant::class, 'id_participant');
     }
 }

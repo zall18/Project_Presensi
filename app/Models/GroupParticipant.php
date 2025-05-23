@@ -9,14 +9,16 @@ class GroupParticipant extends Model
 {
     use HasFactory;
 
-    public function participants()
+    protected $guarded = [];
+
+    public function participant()
     {
-        return $this->belongsToMany(Participant::class);
+        return $this->belongsTo(Participant::class, 'id_participant');
     }
 
-    public function groups()
+    public function group()
     {
-        return $this->hasMany(Group::class);
+        return $this->belongsTo(Group::class, 'id_group');
     }
 
 

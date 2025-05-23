@@ -10,11 +10,11 @@ class JadwalParticipant extends Model
     use HasFactory;
 
     public function shift(){
-        return $this->hasMany(Shift::class);
+        return $this->belongsTo(Shift::class, 'id_shift');
     }
 
     public function participant(){
-        return $this->hasMany(Participant::class);
+        return $this->belongsTo(Participant::class);
     }
 
 }
