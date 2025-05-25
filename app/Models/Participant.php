@@ -18,7 +18,7 @@ class Participant extends Model
 
     public function jadwalParticipant()
     {
-        return $this->belongsToMany(JadwalParticipant::class);
+        return $this->hasOne(JadwalParticipant::class, 'id_participant');
     }
 
     public function groupParticipants()

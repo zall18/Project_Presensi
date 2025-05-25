@@ -15,8 +15,8 @@ class Shift extends Model
         return $this->belongsTo(JamKerja::class, 'id_jam_kerja');
     }
 
-    public function detail_shift() {
-        return $this->hasOne(DetailShift::class);
+    public function detailShifts() {
+        return $this->hasMany(DetailShift::class, 'id_shift');
     }
 
     public function jadwal_participant() {

@@ -17,7 +17,7 @@ class ShiftFactory extends Factory
     public function definition(): array
     {
         return [
-            'nama' => 'Shift ' . $this->faker->randomElement(['Pagi', 'Siang', 'Malam']),
+            'nama' => $this->faker->randomElement(['Guru', 'Staff', 'Murid']),
             'tanggal_mulai' => $this->faker->date(),
             // 'hitungan_lembur' => $this->faker->randomFloat(2, 0, 5),
             'id_jam_kerja' => \App\Models\JamKerja::factory(),

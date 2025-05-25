@@ -9,7 +9,9 @@ class DetailShift extends Model
 {
     use HasFactory;
 
+    protected $guarded = [];
+
     public function shift() {
-        return $this->belongsTo(Shift::class);
+        return $this->belongsTo(Shift::class, 'id_shift');
     }
 }

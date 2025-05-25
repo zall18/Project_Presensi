@@ -8,13 +8,14 @@ use Illuminate\Database\Eloquent\Model;
 class JadwalParticipant extends Model
 {
     use HasFactory;
+    protected $guarded = [];
 
     public function shift(){
         return $this->belongsTo(Shift::class, 'id_shift');
     }
 
     public function participant(){
-        return $this->belongsTo(Participant::class);
+        return $this->belongsTo(Participant::class, 'id_participant');
     }
 
 }

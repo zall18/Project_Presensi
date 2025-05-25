@@ -8,12 +8,13 @@ use Illuminate\Database\Eloquent\Model;
 class GroupLibur extends Model
 {
     use HasFactory;
+    protected $guarded = [];
 
-    public function waktu_libur(){
-        return $this->hasMany(WaktuLibur::class);
+    public function waktuLibur(){
+        return $this->belongsTo(WaktuLibur::class, 'id_waktu_libur');
     }
 
     public function group(){
-        return $this->hasMany(Group::class);
+        return $this->belongsTo(Group::class, 'id_group');
     }
 }

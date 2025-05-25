@@ -8,9 +8,10 @@ use Illuminate\Database\Eloquent\Model;
 class Device extends Model
 {
     use HasFactory;
+    protected $guarded = [];
 
     public function presensi(){
-        return $this->hasMany(Presensi::class);
+        return $this->hasMany(Presensi::class, 'id_device');
     }
 
     

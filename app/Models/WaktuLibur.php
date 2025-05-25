@@ -8,9 +8,10 @@ use Illuminate\Database\Eloquent\Model;
 class WaktuLibur extends Model
 {
     use HasFactory;
+    protected $guarded = [];
 
     public function grupLibur()
     {
-        return $this->belongsToMany(GrupLibur::class);
+        return $this->hasMany(GroupLibur::class);
     }
 }

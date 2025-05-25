@@ -11,7 +11,7 @@ class ShiftController extends Controller
     // List all shifts
     public function index()
     {
-        $shifts = Shift::with('jamKerja')->get();
+        $shifts = Shift::with('jamKerja', 'detailShifts')->get();
         return response()->json($shifts);
     }
 

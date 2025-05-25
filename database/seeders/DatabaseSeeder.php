@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use App\Models\Shift;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -13,6 +14,7 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         \App\Models\User::factory(10)->create();
+        // \App\Models\DetailShift::factory(6)->create();
 
         // \App\Models\User::factory()->create([
         //     'name' => 'Test User',
@@ -35,6 +37,7 @@ class DatabaseSeeder extends Seeder
             $shift->id_jam_kerja = $jamKerjas->random()->id;
             $shift->save();
         });
+
 
         // 5. Assign shift ke participant
         foreach ($participants as $participant) {

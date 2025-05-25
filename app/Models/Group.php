@@ -17,7 +17,7 @@ class Group extends Model
     }
 
     public function grupLibur() {
-        return $this->belongsToMany(GroupLibur::class, 'group_liburs');
+        return $this->hasMany(GroupLibur::class, 'group_liburs');
     }
 
     public function groupParticipants()
