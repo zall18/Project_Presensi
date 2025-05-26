@@ -14,7 +14,14 @@ class UserController extends Controller
     public function index()
     {
         $users = User::all();
-        return response()->json($users);
+        // return response()->json($users);
+        return view('Managment.User.users', compact('users'));
+    }
+
+    public function create()
+    {
+        // Assuming you want to return a view for creating a new user
+        return view('Managment.User.create');
     }
 
     // Store a newly created user
@@ -33,7 +40,8 @@ class UserController extends Controller
         $validated = $validator->validated();
         $validated['password'] = Hash::make($validated['password']);
         $user = User::create($validated);
-        return response()->json($user, 201);
+        // return response()->json($user, 201);
+        return redirect()->route('user.index')->with('success', 'User created successfully');
     }
 
     // Display the specified user
@@ -44,6 +52,16 @@ class UserController extends Controller
             return response()->json(['message' => 'User not found'], 404);
         }
         return response()->json($user);
+    }
+
+    public function edit($id)
+    {
+        $user = User::find($id);
+        if (!$user) {
+            return response()->json(['message' => 'User not found'], 404);
+        }
+        // Assuming you want to return a view for editing
+        return view('Managment.User.edit', compact('user'));
     }
 
     // Update the specified user
@@ -84,6 +102,6 @@ class UserController extends Controller
         }
         $user->delete();
 
-        return response()->json(['message' => 'User deleted']);
+        return back()->with('success', 'User deleted successfully');
     }
 }

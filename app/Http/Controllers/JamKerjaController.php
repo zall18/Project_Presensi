@@ -12,7 +12,8 @@ class JamKerjaController extends Controller
     public function index()
     {
         $jamKerjas = JamKerja::all();
-        return response()->json($jamKerjas);
+        // return response()->json($jamKerjas);
+        return view('Managment.JamKerja.jamKerja', compact('jamKerjas'));
     }
 
     // Store a new jam kerja
@@ -30,33 +31,39 @@ class JamKerjaController extends Controller
             'status_check_out' => 'required|in:on-time,early,absent,excused',
         ]);
         if ($validated->fails()) {
-            return response()->json($validated->errors(), 422);
+            // return response()->json($validated->errors(), 422);
+            return back()->withErrors($validated)->withInput();
         }
         $validated = $validated->validated();
 
         // Check if jam_masuk is before jam_pulang
         if ($validated['jam_masuk'] >= $validated['jam_pulang']) {
-            return response()->json(['message' => 'Jam masuk harus sebelum jam pulang'], 422);
+            // return response()->json(['message' => 'Jam masuk harus sebelum jam pulang'], 422);
+            return back()->withErrors(['jam_masuk' => 'Jam masuk harus sebelum jam pulang'])->withInput();
         }
 
         // Check if jam_mulai_scan_masuk is before jam_mulai_scan_keluar
         if ($validated['jam_mulai_scan_masuk'] >= $validated['jam_mulai_scan_keluar']) {
-            return response()->json(['message' => 'Jam mulai scan masuk harus sebelum jam mulai scan keluar'], 422);
+            // return response()->json(['message' => 'Jam mulai scan masuk harus sebelum jam mulai scan keluar'], 422);
+            return back()->withErrors(['jam_mulai_scan_masuk' => 'Jam mulai scan masuk harus sebelum jam mulai scan keluar'])->withInput();
         }
 
         // Check if jam_mulai_scan_masuk is before or equal to jam_masuk
         if ($validated['jam_mulai_scan_masuk'] > $validated['jam_masuk']) {
-            return response()->json(['message' => 'Jam mulai scan masuk harus sebelum atau sama dengan jam masuk'], 422);
+            // return response()->json(['message' => 'Jam mulai scan masuk harus sebelum atau sama dengan jam masuk'], 422);
+            return back()->withErrors(['jam_mulai_scan_masuk' => 'Jam mulai scan masuk harus sebelum atau sama dengan jam masuk'])->withInput();
         }
-        
+
         // Check if jam_mulai_scan_keluar is before or equal to jam_pulang
         if ($validated['jam_mulai_scan_keluar'] > $validated['jam_pulang']) {
-            return response()->json(['message' => 'Jam mulai scan keluar harus sebelum atau sama dengan jam pulang'], 422);
+            // return response()->json(['message' => 'Jam mulai scan keluar harus sebelum atau sama dengan jam pulang'], 422);
+            return back()->withErrors(['jam_mulai_scan_keluar' => 'Jam mulai scan keluar harus sebelum atau sama dengan jam pulang'])->withInput();
         }
 
         $jamKerja = JamKerja::create($validated);
 
-        return response()->json($jamKerja, 201);
+        // return response()->json($jamKerja, 201);
+        return redirect()->route('jamKerja.index')->with('success', 'Jam Kerja created successfully');
     }
 
     // Show a single jam kerja
@@ -110,7 +117,7 @@ class JamKerjaController extends Controller
         if ($validated['jam_mulai_scan_masuk'] > $validated['jam_masuk']) {
             return response()->json(['message' => 'Jam mulai scan masuk harus sebelum atau sama dengan jam masuk'], 422);
         }
-        
+
         // Check if jam_mulai_scan_keluar is before or equal to jam_pulang
         if ($validated['jam_mulai_scan_keluar'] > $validated['jam_pulang']) {
             return response()->json(['message' => 'Jam mulai scan keluar harus sebelum atau sama dengan jam pulang'], 422);
@@ -118,7 +125,9 @@ class JamKerjaController extends Controller
 
         $jamKerja->update($validated);
 
-        return response()->json($jamKerja);
+        // return response()->json($jamKerja);
+        return redirect()->route('jamKerja.index')->with('success', 'Jam Kerja updated successfully');
+
     }
 
     // Delete a jam kerja
@@ -135,6 +144,8 @@ class JamKerjaController extends Controller
 
         $jamKerja->delete();
 
-        return response()->json(['message' => 'JamKerja deleted']);
+        // return response()->json(['message' => 'JamKerja deleted']);
+        return back()->with('message', "Success to delete");
+
     }
 }

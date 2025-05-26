@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('presensis', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('id_karyawan')->constrained('participants')->onDelete('cascade');
+            $table->foreignId('id_participant')->constrained('participants')->onDelete('cascade');
             $table->dateTime('waktu_masuk');
             $table->dateTime('waktu_keluar')->nullable();
             $table->foreignId('id_device')->constrained('devices')->onDelete('cascade');

@@ -24,8 +24,8 @@ class JamKerjaFactory extends Factory
             'toleransi_pulang_cepat' => 10,
             'jam_mulai_scan_masuk' => '07:30:00',
             'jam_mulai_scan_keluar' => '16:30:00',
-            'status_check_in' => 'on-time',
-            'status_check_out' => 'on-time',
+            // 'status_check_in' => 'on-time',
+            // 'status_check_out' => 'on-time',
         ];
     }
 }

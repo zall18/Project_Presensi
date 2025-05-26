@@ -18,7 +18,7 @@ class PresensiFactory extends Factory
     {
         $masuk = $this->faker->dateTimeBetween('-1 week', 'now');
         return [
-            'id_karyawan' => \App\Models\Participant::factory(),
+            'id_participant' => \App\Models\Participant::factory(),
             'waktu_masuk' => $masuk,
             'waktu_keluar' => (clone $masuk)->modify('+9 hours'),
             'id_device' => \App\Models\Device::factory(),

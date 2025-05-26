@@ -12,7 +12,12 @@ class GroupsController extends Controller
     public function index()
     {
         $groups = Group::all();
-        return response()->json($groups);
+        // return response()->json($groups);
+        return view('Managment.Group.groups', compact('groups'));
+    }
+
+    public function create(){
+        return view('Managment.Group.create');
     }
 
     // Store a new group
@@ -28,7 +33,8 @@ class GroupsController extends Controller
 
         $group = Group::create($validated);
 
-        return response()->json($group, 201);
+        // return response()->json($group, 201);
+        return redirect()->route('group.index')->with('success', 'Group created successfully');
     }
 
     // Show a single group
@@ -38,7 +44,18 @@ class GroupsController extends Controller
         if (!$group) {
             return response()->json(['message' => 'Group not found'], 404);
         }
-        return response()->json($group);
+        // return response()->json($group);
+        return view('Managment.Group.show', compact('group'));
+    }
+
+    public function edit($id)
+    {
+        $group = Group::find($id);
+        if (!$group) {
+            return response()->json(['message' => 'Group not found'], 404);
+        }
+        // return response()->json($group);
+        return view('Managment.Group.edit', compact('group'));
     }
 
     // Update a group
@@ -58,7 +75,9 @@ class GroupsController extends Controller
         $validated = $validated->validated();
         $group->update($validated);
 
-        return response()->json($group);
+        // return response()->json($group);
+        return redirect()->route('group.index')->with('success', 'Group updated successfully');
+
     }
 
     // Delete a group
@@ -74,6 +93,7 @@ class GroupsController extends Controller
         }
         $group->delete();
 
-        return response()->json(['message' => 'Group deleted']);
+        // return response()->json(['message' => 'Group deleted']);
+        return redirect()->route('group.index')->with('success', 'Group deleted successfully');
     }
 }

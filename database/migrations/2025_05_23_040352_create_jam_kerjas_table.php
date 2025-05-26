@@ -20,8 +20,8 @@ return new class extends Migration
             $table->integer('toleransi_pulang_cepat')->default(0);
             $table->time('jam_mulai_scan_masuk');
             $table->time('jam_mulai_scan_keluar');
-            $table->enum('status_check_in', ['on-time', 'late', 'absent', 'excused'])->default('absent');
-            $table->enum('status_check_out', ['on-time', 'early', 'absent', 'excused'])->default('absent');
+            // $table->enum('status_check_in', ['on-time', 'late', 'absent', 'excused'])->default('absent');
+            // $table->enum('status_check_out', ['on-time', 'early', 'absent', 'excused'])->default('absent');
             $table->timestamps();
         });
     }

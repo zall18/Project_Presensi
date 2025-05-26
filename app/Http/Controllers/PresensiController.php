@@ -37,35 +37,72 @@ class PresensiController extends Controller
         $currentDay = strtolower($currentTime->translatedFormat('l')); // This will return the day in Bahasa
         $currentHour = $currentTime->translatedFormat(format: 'H:i:s');
 
-        // Check if the current day is in the jadwalParticipant
-        $isDayInJadwal = $jadwalParticipant->shift->detailShifts->contains(function ($detailShift) use ($currentDay) {
-            return strtolower($detailShift->hari) === $currentDay;
-        });
-        if (!$isDayInJadwal) {
-            return response()->json(['message' => 'Tidak ada jadwal untuk hari ini'], 422);
-        }
 
-        // Check if the current time is within the working hours
-        $isWithinWorkingHours = $jamKerja->where('hari', $currentDay)->contains(function ($jam) use ($currentHour) {
-            return $currentHour >= $jam->jam_masuk && $currentHour <= $jam->jam_pulang;
-        });
-        if (!$isWithinWorkingHours) {
-            return response()->json(['message' => 'Tidak dalam jam kerja'], 422);
-        }
         // Check if the participant has already checked in today
-        $hasCheckedInToday = $participant->presensi()->whereDate('created_at', Carbon::today())->exists();
-        if ($hasCheckedInToday) {
-            return response()->json(['message' => 'Anda sudah melakukan presensi hari ini'], 422);
-        }
-        // Create the attendance record
-        $participant->presensi()->create([
-            'id_kartu' => $id_kartu,
-            'jam_masuk' => $currentHour,
-            'hari' => $currentDay,
-        ]);
-        // Return the current hour in JSON format   
+        $existingAttendance = $participant->presensi()
+            ->whereDate('created_at', Carbon::today())
+            ->first();
+        if ($existingAttendance != null) {
+            if($currentTime > $jamKerja->jam_mulai_scan_keluar) {
+                return response()->json(['message' => 'Belum masuk jam scan keluar'], 422);
+            }
 
-        return response()->json($currentHour);
+            $presensi->update([
+                'waktu_keluar' => $currentTime,
+                'updated_at' => $currentTime, // Set to current time for check-out
+            ]);
+            return response()->json([
+                'message' => 'Presensi berhasil',
+                'waktu_keluar' => $currentTime->format('H:i:s'),
+                'participant' => $participant->nama,
+                'shift' => $jadwalParticipant->shift->nama_shift,
+                'updated_at' => $currentTime
+            ], 200);
+        }else{
+            // Check if the current day is in the jadwalParticipant
+            $isDayInJadwal = $jadwalParticipant->shift->detailShifts->contains(function ($detailShift) use ($currentDay) {
+                return strtolower($detailShift->hari) == $currentDay;
+            });
+            if (!$isDayInJadwal) {
+                return response()->json(['message' => 'Tidak ada jadwal untuk hari ini'], 422);
+            }
+
+            if($currentTime < $jamKerja->jam_mulai_scan_masuk) {
+                return response()->json(['message' => 'Tidak dalam jam scan'], 422);
+            }
+
+            // Check if the current time is within the working hours
+            $isWithinWorkingHours = $jamKerja->get()->contains(function ($jam) use ($currentHour) {
+                return $currentHour >= $jam->jam_masuk && $currentHour <= $jam->jam_pulang;
+            });
+
+            if (!$isWithinWorkingHours) {
+                return response()->json(['message' => 'Tidak dalam jam kerja'], 422);
+            }
+
+            // Create the attendance record
+            $participant->presensi()->create([
+                'id_participant' => $participant->id,
+                'waktu_masuk' => $currentTime,
+                'waktu_keluar' => null, // Set to null for check-in
+                'id_device' => 1, // Assuming a default device ID, replace with actual logic if needed
+                'id_shift' => $jadwalParticipant->shift->id,
+                'updated_at' => null, // Set to null for check-in
+            ]);
+        }
+
+
+
+        // // Return the current hour in JSON format
+        // return response()->json([
+        //     'message' => 'Presensi berhasil',
+        //     'waktu_masuk' => $currentTime->format('H:i:s'),
+        //     'participant' => $participant->nama,
+        //     'shift' => $jadwalParticipant->shift->nama_shift,
+        //     'updated_at' => null
+        // ]);
+        return response()->json($existingAttendance, 200);
+
 
 
     }

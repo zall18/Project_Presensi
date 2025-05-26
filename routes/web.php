@@ -1,5 +1,17 @@
 <?php
 
+use App\Http\Controllers\DetailShiftController;
+use App\Http\Controllers\DeviceController;
+use App\Http\Controllers\GroupLiburController;
+use App\Http\Controllers\GroupParticipantController;
+use App\Http\Controllers\GroupsController;
+use App\Http\Controllers\JadwalParticipantController;
+use App\Http\Controllers\JamKerjaController;
+use App\Http\Controllers\ParticipantsController;
+use App\Http\Controllers\PresensiController;
+use App\Http\Controllers\ShiftController;
+use App\Http\Controllers\UserController;
+use App\Http\Controllers\WaktuLiburController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -14,5 +26,10 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    return view('dashboard');
 });
+
+Route::resource('user', UserController::class);
+Route::resource('participant', ParticipantsController::class);
+Route::resource('group', GroupsController::class);
+Route::resource('jamKerja', jamKerjaController::class);

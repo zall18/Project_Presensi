@@ -53,7 +53,7 @@ class DatabaseSeeder extends Seeder
         // 7. Buat presensi untuk tiap peserta, 1x saja per orang
         foreach ($participants as $participant) {
             \App\Models\Presensi::factory()->create([
-                'id_karyawan' => $participant->id,
+                'id_participant' => $participant->id,
                 'id_device' => $devices->random()->id,
                 'id_shift' => $shifts->random()->id,
             ]);

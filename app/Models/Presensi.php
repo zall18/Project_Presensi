@@ -9,6 +9,8 @@ class Presensi extends Model
 {
     use HasFactory;
 
+    protected $guarded = [];
+
     public function device()
     {
         return $this->belongsTo(Device::class, 'id_device');
@@ -16,5 +18,10 @@ class Presensi extends Model
 
     public function shift(){
         return $this->belongsTo(Shift::class);
+    }
+
+    public function participant()
+    {
+        return $this->belongsTo(Participant::class, 'id_participant');
     }
 }

@@ -12,7 +12,14 @@ class ParticipantsController extends Controller
     public function index()
     {
         $participants = Participant::all();
-        return response()->json($participants);
+        // return response()->json($participants);
+        return view('Managment.Participant.participants', compact('participants'));
+    }
+
+    public function create()
+    {
+        // Assuming you want to return a view for creating a new participant
+        return view('Managment.Participant.create');
     }
 
     // Store a new participant
@@ -27,12 +34,15 @@ class ParticipantsController extends Controller
         ]);
 
         if ($validated->fails()) {
-            return response()->json($validated->errors(), 422);
+            // return response()->json($validated->errors(), 422);
+            return back()->withErrors($validated)->withInput();
         }
         $validated = $validated->validated();
         $participant = Participant::create($validated);
 
-        return response()->json($participant, 201);
+        // return response()->json($participant, 201);
+        // return back()->with('success', 'Participant created successfully');
+        return redirect()->route('participant.index')->with('success', 'Participant created successfully');
     }
 
     // Show a single participant
@@ -43,7 +53,8 @@ class ParticipantsController extends Controller
             return response()->json(['message' => 'Participant not found'], 404);
         }
 
-        return response()->json($participant);
+        // return response()->json($participant);
+        return view('Managment.Participant.show', compact('participant'));
     }
 
     // show a participant by id_kartu
@@ -54,7 +65,20 @@ class ParticipantsController extends Controller
             return response()->json(['message' => 'Participant not found'], 404);
         }
 
-        return response()->json($participant);
+        // return response()->json($participant);
+        return view('Managment.Participant.show', compact('participant'));
+    }
+
+    public function edit($id)
+    {
+        $participant = Participant::find($id);
+        if (!$participant) {
+            // return response()->json(['message' => 'Participant not found'], 404);
+            return back()->with('error', 'Participant not found');
+        }
+
+        // Assuming you want to return a view for editing
+        return view('Managment.Participant.edit', compact('participant'));
     }
 
     // Update a participant
@@ -72,7 +96,9 @@ class ParticipantsController extends Controller
 
         $participant->update($validated);
 
-        return response()->json($participant);
+        // return response()->json($participant);
+        // return back()->with('success', 'Participant updated successfully');
+        return redirect()->route('participant.index')->with('success', 'Participant updated successfully');
     }
 
     // Delete a participant
@@ -80,10 +106,12 @@ class ParticipantsController extends Controller
     {
         $participant = Participant::find($id);
         if (!$participant) {
-            return response()->json(['message' => 'Participant not found'], 404);
+            // return response()->json(['message' => 'Participant not found'], 404);
+            return back()->with('error', 'Participant not found');
         }
         $participant->delete();
 
-        return response()->json(['message' => 'Participant deleted']);
+        // return response()->json(['message' => 'Participant deleted']);
+        return back()->with('success', 'Participant deleted successfully');
     }
 }
