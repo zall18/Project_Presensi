@@ -1,48 +1,143 @@
 @extends('Template.template')
 
 @section('container')
-    <div class="container mt-4">
-        <h3 class="mb-4">Create User</h3>
-        <form action="{{ route('user.store') }}" method="POST">
-            @csrf
-            <div class="mb-3">
-                <label for="name" class="form-label">Username</label>
-                <input
-                    type="text"
-                    class="form-control"
-                    id="name"
-                    name="name"
-                    value="{{ old('name') }}"
-                    required>
-            </div>
-            <div class="mb-3">
-                <label for="email" class="form-label">Email</label>
-                <input
-                    type="email"
-                    class="form-control"
-                    id="email"
-                    name="email"
-                    value="{{ old('email') }}"
-                    required>
-            </div>
-            <div class="mb-3">
-                <label for="password" class="form-label">Password</label>
-                <input
-                    type="password"
-                    class="form-control"
-                    id="password"
-                    name="password"
-                    required>
-            </div>
-            <div class="mb-3">
-                <label for="level" class="form-label">Level</label>
-                <select class="form-select" id="level" name="level" required>
-                    <option value="admin" {{ old('level') == 'admin' ? 'selected' : '' }}>Admin</option>
-                    <option value="operator" {{ old('level') == 'operator' ? 'selected' : '' }}>Operator</option>
-                </select>
-            </div>
-            <button type="submit" class="btn btn-primary">Create</button>
-            <a href="{{ route('user.index') }}" class="btn btn-secondary">Cancel</a>
-        </form>
+<div class="container mt-4">
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-4 gap-3">
+        <div>
+            <h3 class="fw-semibold mb-1">Create New User</h3>
+            <p class="text-muted mb-0">Add a new user to the system</p>
+        </div>
+        <a href="{{ route('user.index') }}" class="btn btn-outline-secondary">
+            <i class="ti ti-arrow-left me-1"></i> Back to Users
+        </a>
     </div>
+
+    <div class="card shadow-sm border-0">
+        <div class="card-body">
+            <form action="{{ route('user.store') }}" method="POST">
+                @csrf
+                
+                <div class="row g-3">
+                    <!-- Username Field -->
+                    <div class="col-md-6">
+                        <div class="form-floating">
+                            <input type="text" 
+                                   class="form-control @error('name') is-invalid @enderror" 
+                                   id="name" 
+                                   name="name" 
+                                   placeholder="John Doe"
+                                   value="{{ old('name') }}"
+                                   required>
+                            <label for="name">Username</label>
+                            @error('name')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+                    </div>
+                    
+                    <!-- Email Field -->
+                    <div class="col-md-6">
+                        <div class="form-floating">
+                            <input type="email" 
+                                   class="form-control @error('email') is-invalid @enderror" 
+                                   id="email" 
+                                   name="email" 
+                                   placeholder="user@example.com"
+                                   value="{{ old('email') }}"
+                                   required>
+                            <label for="email">Email Address</label>
+                            @error('email')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+                    </div>
+                    
+                    <!-- Password Field -->
+                    <div class="col-md-6">
+                        <div class="form-floating">
+                            <input type="password" 
+                                   class="form-control @error('password') is-invalid @enderror" 
+                                   id="password" 
+                                   name="password" 
+                                   placeholder="Password"
+                                   required>
+                            <label for="password">Password</label>
+                            @error('password')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                            <small class="text-muted mt-1 d-block">Minimum 8 characters</small>
+                        </div>
+                    </div>
+                    
+                    <!-- Confirm Password Field -->
+                    <div class="col-md-6">
+                        <div class="form-floating">
+                            <input type="password" 
+                                   class="form-control" 
+                                   id="password_confirmation" 
+                                   name="password_confirmation" 
+                                   placeholder="Confirm Password"
+                                   required>
+                            <label for="password_confirmation">Confirm Password</label>
+                        </div>
+                    </div>
+                    
+                    <!-- Level Field -->
+                    <div class="col-md-6">
+                        <div class="form-floating">
+                            <select class="form-select @error('level') is-invalid @enderror" 
+                                    id="level" 
+                                    name="level" 
+                                    required>
+                                <option value="admin" {{ old('level') == 'admin' ? 'selected' : '' }}>Admin</option>
+                                <option value="operator" {{ old('level') == 'operator' ? 'selected' : '' }}>Operator</option>
+                            </select>
+                            <label for="level">User Role</label>
+                            @error('level')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mt-4 pt-2 border-top">
+                    <button type="submit" class="btn btn-primary px-4">
+                        <i class="ti ti-user-plus me-1"></i> Create User
+                    </button>
+                    <button type="reset" class="btn btn-outline-secondary ms-2">
+                        <i class="ti ti-reload me-1"></i> Reset
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+    .form-floating {
+        position: relative;
+        margin-bottom: 1rem;
+    }
+    .form-floating > label {
+        color: var(--bs-secondary-color);
+        transition: all 0.2s ease-in-out;
+    }
+    .form-floating > .form-control:focus ~ label,
+    .form-floating > .form-control:not(:placeholder-shown) ~ label,
+    .form-floating > .form-select ~ label {
+        transform: scale(0.85) translateY(-0.5rem) translateX(0.15rem);
+        opacity: 0.8;
+        background: white;
+        padding: 0 0.5rem;
+        color: var(--bs-primary);
+    }
+    .form-control, .form-select {
+        border-radius: 0.375rem;
+        padding: 1rem 0.75rem;
+    }
+    .form-control:focus, .form-select:focus {
+        border-color: var(--bs-primary);
+        box-shadow: 0 0 0 0.25rem rgba(var(--bs-primary-rgb), 0.1);
+    }
+</style>
 @endsection

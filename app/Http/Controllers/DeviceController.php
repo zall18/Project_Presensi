@@ -12,7 +12,14 @@ class DeviceController extends Controller
     public function index()
     {
         $devices = Device::all();
-        return response()->json($devices);
+        // return response()->json($devices);
+        return view('Managment.Device.devices', compact('devices'));
+    }
+
+    public function create()
+    {
+        // return response()->json(['message' => 'Create Device']);
+        return view('Managment.Device.create');
     }
 
     // Store a new device
@@ -25,13 +32,15 @@ class DeviceController extends Controller
             'status' => 'required|in:active,inactive',
         ]);
         if ($validated->fails()) {
-            return response()->json($validated->errors(), 422);
+            // return response()->json($validated->errors(), 422);
+            return back()->withErrors($validated)->withInput();
         }
         $validated = $validated->validated();
 
         $device = Device::create($validated);
 
-        return response()->json($device, 201);
+        // return response()->json($device, 201);
+        return redirect()->route('device.index')->with('success', 'Device created successfully');
     }
 
     // Show a single device
@@ -39,9 +48,11 @@ class DeviceController extends Controller
     {
         $device = Device::find($id);
         if (!$device) {
-            return response()->json(['message' => 'Device not found'], 404);
+            // return response()->json(['message' => 'Device not found'], 404);
+            return redirect()->route('device.index')->withErrors(['message' => 'Device not found']);
         }
-        return response()->json($device);
+        // return response()->json($device);
+        return view('Managment.Device.show', compact('device'));
     }
 
     // Update a device
@@ -49,7 +60,8 @@ class DeviceController extends Controller
     {
         $device = Device::find($id);
         if (!$device) {
-            return response()->json(['message' => 'Device not found'], 404);
+            // return response()->json(['message' => 'Device not found'], 404);
+            return redirect()->route('device.index')->withErrors(['message' => 'Device not found']);
         }
 
         $validated = Validator::make($request->all(), [
@@ -59,7 +71,8 @@ class DeviceController extends Controller
             'status' => 'sometimes|required|in:active,inactive',
         ]);
         if ($validated->fails()) {
-            return response()->json($validated->errors(), 422);
+            // return response()->json($validated->errors(), 422);
+            return back()->withErrors($validated)->withInput();
         }
         $validated = $validated->validated();
         if (isset($validated['device_id'])) {
@@ -67,13 +80,15 @@ class DeviceController extends Controller
                 ->where('id', '!=', $id)
                 ->first();
             if ($existingDevice) {
-                return response()->json(['message' => 'Device ID already exists'], 422);
+                // return response()->json(['message' => 'Device ID already exists'], 422);
+                return back()->withErrors(['message' => 'Device ID already exists'])->withInput();
             }
         }
 
         $device->update($validated);
 
-        return response()->json($device);
+        // return response()->json($device);
+        return redirect()->route('device.index')->with('success', 'Device updated successfully');
     }
 
     // Delete a device
@@ -81,15 +96,18 @@ class DeviceController extends Controller
     {
         $device = Device::find($id);
         if (!$device) {
-            return response()->json(['message' => 'Device not found'], 404);
+            // return response()->json(['message' => 'Device not found'], 404);
+            return redirect()->route('device.index')->withErrors(['message' => 'Device not found']);
         }
         // Check if the device is in use
         if ($device->presensi()->count() > 0) {
             // If the device is in use, return an error response
-            return response()->json(['message' => 'Device is in use and cannot be deleted'], 422);
+            // return response()->json(['message' => 'Device is in use and cannot be deleted'], 422);
+            return redirect()->route('device.index')->withErrors(['message' => 'Device is in use and cannot be deleted']);
         }
         $device->delete();
 
-        return response()->json(['message' => 'Device deleted']);
+        // return response()->json(['message' => 'Device deleted']);
+        return redirect()->route('device.index')->with('success', 'Device deleted successfully');
     }
 }

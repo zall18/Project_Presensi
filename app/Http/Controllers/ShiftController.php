@@ -12,7 +12,8 @@ class ShiftController extends Controller
     public function index()
     {
         $shifts = Shift::with('jamKerja', 'detailShifts')->get();
-        return response()->json($shifts);
+        // return response()->json($shifts);
+        return view('Managment.Shift.shifts', compact('shifts'));
     }
 
     // Store a new shift
@@ -24,7 +25,8 @@ class ShiftController extends Controller
             'id_jam_kerja' => 'required|exists:jam_kerjas,id',
         ]);
         if ($validated->fails()) {
-            return response()->json($validated->errors(), 422);
+            // return response()->json($validated->errors(), 422);
+            return back()->withErrors($validated)->withInput();
         }
         $validated = $validated->validated();
         // Check if the shift already exists
@@ -38,7 +40,8 @@ class ShiftController extends Controller
 
         $shift = Shift::create($validated);
 
-        return response()->json($shift->load('jamKerja'), 201);
+        // return response()->json($shift->load('jamKerja'), 201);
+        return redirect()->route('shift.index')->with('success', 'Shift created successfully');
     }
 
     // Show a single shift
@@ -48,7 +51,8 @@ class ShiftController extends Controller
         if (!$shift) {
             return response()->json(['message' => 'Shift not found'], 404);
         }
-        return response()->json($shift);
+        // return response()->json($shift);
+        return view('Managment.Shift.show', compact('shift'));
     }
 
     // Update a shift
@@ -79,7 +83,8 @@ class ShiftController extends Controller
 
         $shift->update($validated);
 
-        return response()->json($shift->load('jamKerja'));
+        // return response()->json($shift->load('jamKerja'));
+        return redirect()->route('shift.index')->with('success', 'Shift updated successfully');
     }
 
     // Delete a shift
@@ -97,6 +102,7 @@ class ShiftController extends Controller
 
         $shift->delete();
 
-        return response()->json(['message' => 'Shift deleted']);
+        // return response()->json(['message' => 'Shift deleted']);
+        return redirect()->route('shift.index')->with('success', 'Shift deleted successfully');
     }
 }

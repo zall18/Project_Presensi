@@ -2,12 +2,27 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Presensi;
 use App\Models\Participant;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 
 class PresensiController extends Controller
 {
+    // Show all presensi records
+    public function index(Request $request)
+    {
+        $presensis = Presensi::with('participant')->orderBy('created_at', 'desc')->get();
+        return view('managment.presensi.presensis', compact('presensis'));
+    }
+
+    // Show a single presensi record
+    public function show($id)
+    {
+        $presensi = Presensi::with('participant')->findOrFail($id);
+        return view('Managment.Presensi.show', compact('presensi'));
+    }
+
     public function store($id_kartu)
     {
         $participant = Participant::where('id_kartu', $id_kartu)->with('jadwalParticipant')->first();
@@ -47,7 +62,7 @@ class PresensiController extends Controller
                 return response()->json(['message' => 'Belum masuk jam scan keluar'], 422);
             }
 
-            $presensi->update([
+            $participant->presensi()->update([
                 'waktu_keluar' => $currentTime,
                 'updated_at' => $currentTime, // Set to current time for check-out
             ]);
@@ -105,5 +120,40 @@ class PresensiController extends Controller
 
 
 
+    }
+
+    // Show the edit form
+    public function edit($id)
+    {
+        $presensi = Presensi::findOrFail($id);
+        $participants = Participant::all();
+        return view('Managment.Presensi.edit', compact('presensi', 'participants'));
+    }
+
+    // Update the presensi record
+    public function update(Request $request, $id)
+    {
+        $presensi = Presensi::findOrFail($id);
+
+        $request->validate([
+            'participant_id' => 'required|exists:participants,id',
+            'tanggal' => 'required|date',
+            'jam_masuk' => 'required',
+            'jam_pulang' => 'required',
+            'status' => 'required'
+        ]);
+
+        $presensi->update($request->all());
+
+        return redirect()->route('presensi.index')->with('success', 'Presensi updated successfully.');
+    }
+
+    // Delete the presensi record
+    public function destroy($id)
+    {
+        $presensi = Presensi::findOrFail($id);
+        $presensi->delete();
+
+        return redirect()->route('presensi.index')->with('success', 'Presensi deleted successfully.');
     }
 }

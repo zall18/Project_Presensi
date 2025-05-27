@@ -5,8 +5,38 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Presensi SMK YPC TASIKMALAYA</title>
-  <link rel="shortcut icon" type="image/png" href="{{ asset('images/profile/wh.jpeg') }}" />
+  <link rel="shortcut icon" type="image/png" href="{{ asset('images/profile/YPC.png') }}" />
   <link rel="stylesheet" href="{{ asset('css/styles.min.css') }}" />
+  <style>
+    .btn-icon {
+        width: 32px;
+        height: 32px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0;
+    }
+    .table th {
+        white-space: nowrap;
+        font-weight: 500;
+        font-size: 0.8125rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: var(--bs-secondary-color);
+    }
+    .badge {
+        font-weight: 500;
+        padding: 0.35em 0.65em;
+        font-size: 0.75em;
+    }
+    .pagination .page-item.active .page-link {
+        background-color: var(--bs-primary);
+        border-color: var(--bs-primary);
+    }
+    .pagination .page-link {
+        color: var(--bs-primary);
+    }
+</style>
 </head>
 
 <body>

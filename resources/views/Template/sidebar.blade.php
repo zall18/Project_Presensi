@@ -3,7 +3,7 @@
       <div>
         <div class="brand-logo d-flex align-items-center justify-content-between">
           <a href="./index.html" class="text-nowrap logo-img">
-            <img src="{{ asset('images/profile/wh.jpeg') }}" width="60" alt="" />
+            <img src="{{ asset('images/profile/YPC.png') }}" width="60" alt="" class="m-auto" />
           </a>
           <div class="close-btn d-xl-none d-block sidebartoggler cursor-pointer" id="sidebarCollapse">
             <i class="ti ti-x fs-8"></i>
@@ -61,7 +61,7 @@
               </a>
             </li>
             <li class="sidebar-item">
-              <a class="sidebar-link" href="./ui-typography.html" aria-expanded="false">
+              <a class="sidebar-link" href="/shift" aria-expanded="false">
                 <span>
                   <i class="ti ti-sitemap"></i>
                 </span>
@@ -69,7 +69,7 @@
               </a>
             </li>
             <li class="sidebar-item">
-              <a class="sidebar-link" href="./ui-typography.html" aria-expanded="false">
+              <a class="sidebar-link" href="/jadwalParticipant" aria-expanded="false">
                 <span>
                   <i class="ti ti-clock"></i>
                 </span>
@@ -77,7 +77,7 @@
               </a>
             </li>
             <li class="sidebar-item">
-              <a class="sidebar-link" href="./ui-typography.html" aria-expanded="false">
+              <a class="sidebar-link" href="/presensi" aria-expanded="false">
                 <span>
                   <i class="ti ti-presentation"></i>
                 </span>
@@ -85,11 +85,19 @@
               </a>
             </li>
             <li class="sidebar-item">
-              <a class="sidebar-link" href="./ui-typography.html" aria-expanded="false">
+              <a class="sidebar-link" href="/waktulibur" aria-expanded="false">
                 <span>
                   <i class="ti ti-circle-off"></i>
                 </span>
                 <span class="hide-menu">Waktu Libur</span>
+              </a>
+            </li>
+            <li class="sidebar-item">
+              <a class="sidebar-link" href="/device" aria-expanded="false">
+                <span>
+                  <i class="ti ti-square"></i>
+                </span>
+                <span class="hide-menu">Device</span>
               </a>
             </li>
 

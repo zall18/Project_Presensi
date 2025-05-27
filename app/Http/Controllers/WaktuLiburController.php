@@ -11,8 +11,15 @@ class WaktuLiburController extends Controller
     // List all waktu libur
     public function index()
     {
-        $waktuLibur = WaktuLibur::all();
-        return response()->json($waktuLibur);
+        $waktuLiburs = WaktuLibur::all();
+        // return response()->json($waktuLibur);
+        return view('Managment.WaktuLibur.waktuLiburs', compact('waktuLiburs'));
+    }
+    
+    public function create()
+    {
+        // return response()->json(['message' => 'Create Waktu Libur']);
+        return view('Managment.WaktuLibur.create');
     }
 
     // Store a new waktu libur
@@ -24,7 +31,8 @@ class WaktuLiburController extends Controller
             'tanggal_akhir' => 'required|date|after_or_equal:tanggal_mulai',
         ]);
         if ($validated->fails()) {
-            return response()->json($validated->errors(), 422);
+            // return response()->json($validated->errors(), 422);
+            return back()->withErrors($validated)->withInput();
         }
         $validated = $validated->validated();
         // Check if the waktu libur already exists
@@ -33,12 +41,14 @@ class WaktuLiburController extends Controller
             ->where('tanggal_akhir', $validated['tanggal_akhir'])
             ->first();
         if ($existingWaktuLibur) {
-            return response()->json(['message' => 'WaktuLibur already exists'], 422);
+            // return response()->json(['message' => 'WaktuLibur already exists'], 422);
+            return back()->withErrors(['message' => 'WaktuLibur already exists'])->withInput();
         }
 
         $waktuLibur = WaktuLibur::create($validated);
 
-        return response()->json($waktuLibur, 201);
+        // return response()->json($waktuLibur, 201);
+        return redirect()->route('waktuLibur.index')->with('success', 'Waktu Libur created successfully');
     }
 
     // Show a single waktu libur
@@ -46,9 +56,22 @@ class WaktuLiburController extends Controller
     {
         $waktuLibur = WaktuLibur::find($id);
         if (!$waktuLibur) {
-            return response()->json(['message' => 'WaktuLibur not found'], 404);
+            // return response()->json(['message' => 'WaktuLibur not found'], 404);
+            return redirect()->route('waktuLibur.index')->withErrors(['message' => 'WaktuLibur not found']);
         }
-        return response()->json($waktuLibur);
+        // return response()->json($waktuLibur);
+        return view('Managment.WaktuLibur.show', compact('waktuLibur'));
+    }
+
+    public function edit($id)
+    {
+        $waktuLibur = WaktuLibur::find($id);
+        if (!$waktuLibur) {
+            // return response()->json(['message' => 'WaktuLibur not found'], 404);
+            return redirect()->route('waktuLibur.index')->withErrors(['message' => 'WaktuLibur not found']);
+        }
+        // return response()->json($waktuLibur);
+        return view('Managment.WaktuLibur.edit', compact('waktuLibur'));
     }
 
     // Update a waktu libur
@@ -56,7 +79,8 @@ class WaktuLiburController extends Controller
     {
         $waktuLibur = WaktuLibur::find($id);
         if (!$waktuLibur) {
-            return response()->json(['message' => 'WaktuLibur not found'], 404);
+            // return response()->json(['message' => 'WaktuLibur not found'], 404);
+            return redirect()->route('waktuLibur.index')->withErrors(['message' => 'WaktuLibur not found']);
         }
 
         $validated = Validator::make($request->all(), [
@@ -65,7 +89,8 @@ class WaktuLiburController extends Controller
             'tanggal_akhir' => 'sometimes|required|date|after_or_equal:tanggal_mulai',
         ]);
         if ($validated->fails()) {
-            return response()->json($validated->errors(), 422);
+            // return response()->json($validated->errors(), 422);
+            return back()->withErrors($validated)->withInput();
         }
         $validated = $validated->validated();
         // Check if the waktu libur already exists with different ID
@@ -75,12 +100,14 @@ class WaktuLiburController extends Controller
             ->where('id', '!=', $id)
             ->first();
         if ($existingWaktuLibur) {
-            return response()->json(['message' => 'WaktuLibur already exists'], 422);
+            // return response()->json(['message' => 'WaktuLibur already exists'], 422);
+            return back()->withErrors(['message' => 'WaktuLibur already exists'])->withInput();
         }
 
         $waktuLibur->update($validated);
 
-        return response()->json($waktuLibur);
+        // return response()->json($waktuLibur);
+        return redirect()->route('waktuLibur.index')->with('success', 'Waktu Libur updated successfully');
     }
 
     // Delete a waktu libur
@@ -88,10 +115,12 @@ class WaktuLiburController extends Controller
     {
         $waktuLibur = WaktuLibur::find($id);
         if (!$waktuLibur) {
-            return response()->json(['message' => 'WaktuLibur not found'], 404);
+            // return response()->json(['message' => 'WaktuLibur not found'], 404);
+            return redirect()->route('waktuLibur.index')->withErrors(['message' => 'WaktuLibur not found']);
         }
         $waktuLibur->delete();
 
-        return response()->json(['message' => 'WaktuLibur deleted']);
+        // return response()->json(['message' => 'WaktuLibur deleted']);
+        return redirect()->route('waktuLibur.index')->with('success', 'Waktu Libur deleted successfully');
     }
 }
