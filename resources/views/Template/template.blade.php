@@ -36,6 +36,23 @@
     .pagination .page-link {
         color: var(--bs-primary);
     }
+    .form-floating {
+        position: relative;
+        margin-bottom: 1rem;
+    }
+    .form-floating > label {
+        color: var(--bs-secondary-color);
+        transition: all 0.2s ease-in-out;
+    }
+
+    .form-control, .form-select {
+        border-radius: 0.375rem;
+        padding: 1rem 0.75rem;
+    }
+    .form-control:focus, .form-select:focus {
+        border-color: var(--bs-primary);
+        box-shadow: 0 0 0 0.25rem rgba(var(--bs-primary-rgb), 0.1);
+    }
 </style>
 </head>
 

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Shift;
+use App\Models\JamKerja;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -14,6 +15,23 @@ class ShiftController extends Controller
         $shifts = Shift::with('jamKerja', 'detailShifts')->get();
         // return response()->json($shifts);
         return view('Managment.Shift.shifts', compact('shifts'));
+    }
+
+    public function create()
+    {
+        // Assuming you want to return a view for creating a new shift
+        $jamKerjas = JamKerja::all(); // Fetch all jam kerja for the dropdown
+        return view('Managment.Shift.create', compact('jamKerjas'));
+    }
+
+    public function createDetailShift($shift_id)
+    {
+        // Assuming you want to return a view for creating a new detail shift
+        $shift = Shift::with('detailShifts')->find($shift_id);
+        if (!$shift) {
+            return response()->json(['message' => 'Shift not found'], 404);
+        }
+        return view('Managment.Shift.detailShift.create', compact('shift'));
     }
 
     // Store a new shift
@@ -47,12 +65,25 @@ class ShiftController extends Controller
     // Show a single shift
     public function show($id)
     {
-        $shift = Shift::with('jamKerja')->find($id);
+        $shift = Shift::with('jamKerja', 'detailShifts')->find($id);
+        // dd($shift);
         if (!$shift) {
             return response()->json(['message' => 'Shift not found'], 404);
         }
+
         // return response()->json($shift);
         return view('Managment.Shift.show', compact('shift'));
+    }
+
+    public function edit($id)
+    {
+        $shift = Shift::find($id);
+        if (!$shift) {
+            return response()->json(['message' => 'Shift not found'], 404);
+        }
+        $jamKerjas = JamKerja::all();
+        // Assuming you want to return a view for editing the shift
+        return view('Managment.Shift.edit', compact('shift', 'jamKerjas'));
     }
 
     // Update a shift

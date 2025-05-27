@@ -9,9 +9,22 @@ use Illuminate\Support\Facades\Validator;
 class ParticipantsController extends Controller
 {
     // List all participants
-    public function index()
+    public function index(Request $request)
     {
-        $participants = Participant::all();
+        // $participants = Participant::all();
+        $participants = Participant::paginate(10); // Dpagination
+
+        if ($request->search){
+            $participants = Participant::where('nama', 'like', '%' . $request->search .'%')
+                ->orWhere('no_induk', 'like', '%' . $request->search . '%')
+                ->orWhere('id_kartu', 'like', '%' . $request->search . '%')
+                ->paginate(10);
+        } elseif ($request->sort && $request->direction) {
+            $participants = Participant::orderBy($request->sort, $request->direction)->paginate(10);
+        } else {
+            $participants = Participant::paginate(10);
+        }
+
         // return response()->json($participants);
         return view('Managment.Participant.participants', compact('participants'));
     }

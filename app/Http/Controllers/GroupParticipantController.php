@@ -12,33 +12,45 @@ class GroupParticipantController extends Controller
     public function index()
     {
         $groupParticipants = GroupParticipant::with(['participant', 'group'])->get();
-        return response()->json($groupParticipants);
+        // return response()->json($groupParticipants);
+        return view('Managment.Group.groups', compact('groupParticipants'));
     }
 
     // Store a new group participant
     public function store(Request $request)
     {
-        $validator = Validator::make($request->all(), [
-            'id_participant' => 'required|exists:participants,id',
-            'id_group' => 'required|exists:groups,id',
-        ]);
-        if ($validator->fails()) {
-            return response()->json($validator->errors(), 422);
+        // dd($request->all());
+        // $validator = Validator::make($request->all(), [
+        //     // 'id_participant' => 'required|exists:participants,id',
+        //     'group_id' => 'required|exists:groups,id',
+        // ]);
+        // if ($validator->fails()) {
+        //     // return response()->json($validator->errors(), 422);
+        //     return back()->withErrors($validator)->withInput();
+        // }
+        // $validated = $validator->validated();
+
+        foreach ($request->participants as $id) {
+
+            // Check if the participant is already in the group
+            $existingGroupParticipant = GroupParticipant::where('id_participant', $id)
+                ->first();
+            if ($existingGroupParticipant) {
+                GroupParticipant::where('id_participant', $id)
+                    ->update(['id_group' => $request->group_id]);
+                continue; // Skip to the next participant if already exists
+            }
+            GroupParticipant::create([
+                'id_group' => $request->group_id,
+                'id_participant' => $id,
+            ]);
         }
-        $validated = $validator->validated();
 
-        // Check if the participant is already in the group
-        $existingGroupParticipant = GroupParticipant::where('id_participant', $validated['id_participant'])
-            ->where('id_group', $validated['id_group'])
-            ->first();
+        // $groupParticipant = GroupParticipant::create($validated);
 
-        if ($existingGroupParticipant) {
-            return response()->json(['message' => 'Participant already in the group'], 422);
-        }
 
-        $groupParticipant = GroupParticipant::create($validated);
-
-        return response()->json($groupParticipant->load(['participant', 'group']), 201);
+        // return response()->json($groupParticipant->load(['participant', 'group']), 201);
+        return redirect()->route('group.show', $request->group_id)->with('success', 'GroupParticipant created successfully');
     }
 
     // Show a single group participant
@@ -46,9 +58,11 @@ class GroupParticipantController extends Controller
     {
         $groupParticipant = GroupParticipant::find($id)->load(['participant', 'group']);
         if (!$groupParticipant) {
-            return response()->json(['message' => 'GroupParticipant not found'], 404);
+            // return response()->json(['message' => 'GroupParticipant not found'], 404);
+            return redirect()->route('groupParticipant.index')->withErrors(['message' => 'GroupParticipant not found']);
         }
-        return response()->json($groupParticipant);
+        // return response()->json($groupParticipant);
+        // return view('Managment.GroupParticipant.show', compact('groupParticipant'));
     }
 
     // Update a group participant
@@ -56,7 +70,8 @@ class GroupParticipantController extends Controller
     {
         $groupParticipant = GroupParticipant::find($id);
         if (!$groupParticipant) {
-            return response()->json(['message' => 'GroupParticipant not found'], 404);
+            // return response()->json(['message' => 'GroupParticipant not found'], 404);
+            return redirect()->route('groupParticipant.index')->withErrors(['message' => 'GroupParticipant not found']);
         }
 
         $validated = $request->validate([
@@ -71,25 +86,30 @@ class GroupParticipantController extends Controller
             ->first();
 
         if ($existingGroupParticipant) {
-            return response()->json(['message' => 'Participant already in the group'], 422);
+            // return response()->json(['message' => 'Participant already in the group'], 422);
+            return back()->withErrors(['message' => 'Participant already in the group'])->withInput();
         }
 
         $groupParticipant->update($validated);
 
-        return response()->json($groupParticipant->load(['participant', 'group']));
+        // return response()->json($groupParticipant->load(['participant', 'group']));
+        return redirect()->route('groupParticipant.index')->with('success', 'GroupParticipant updated successfully');
     }
 
     // Delete a group participant
-    public function destroy($id)
+    public function destroy(Request $request ,$id)
     {
-        $groupParticipant = GroupParticipant::find($id);
+
+        $groupParticipant = GroupParticipant::where('id_participant', $id)->first();
 
         if (!$groupParticipant) {
-            return response()->json(['message' => 'GroupParticipant not found'], 404);
+            // return response()->json(['message' => 'GroupParticipant not found'], 404);
+            return redirect()->route('group.show', $request->group_id)->withErrors(['message' => 'GroupParticipant not found']);
         }
-        
+
         $groupParticipant->delete();
 
-        return response()->json(['message' => 'GroupParticipant deleted']);
+        // return response()->json(['message' => 'GroupParticipant deleted']);
+        return redirect()->route('group.show', $request->group_id)->with('success', 'GroupParticipant deleted successfully');
     }
 }

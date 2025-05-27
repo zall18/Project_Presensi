@@ -34,11 +34,11 @@
                 </div>
                 <div class="col-md-6 text-md-end">
                     <div class="text-muted small">
-                        {{-- @if($jamKerjas->total() > 0)
+                        @if($jamKerjas->total() > 0)
                         Showing {{ $jamKerjas->firstItem() }}-{{ $jamKerjas->lastItem() }} of {{ $jamKerjas->total() }}
-                        @else --}}
+                        @else
                         No records found
-                        {{-- @endif --}}
+                        @endif
                     </div>
                 </div>
             </div>
@@ -85,9 +85,9 @@
                         </tr>
                     </thead>
                     <tbody class="border-top-0">
-                        @forelse ($jamKerjas as $jamKerja)
+                        @forelse ($jamKerjas as $key => $jamKerja)
                         <tr>
-                            <td class="ps-4 fw-semibold">{{ $jamKerja->id }}</td>
+                            <td class="ps-4 fw-semibold">{{ $key + 1 }}</td>
                             <td>
                                 <div class="d-flex align-items-center gap-3">
                                     <div class="d-flex flex-column">
@@ -134,10 +134,22 @@
                 </table>
             </div>
         </div>
-        {{-- Pagination --}}
-        {{-- <div class="d-flex justify-content-end mt-3">
-            {{ $jamKerjas->links() }}
-        </div> --}}
+    @if($jamKerjas->hasPages())
+        <div class="card-footer bg-transparent border-0 py-3">
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-center">
+                <div class="mb-2 mb-md-0">
+                    <p class="small text-muted mb-0">
+                        Showing {{ $jamKerjas->firstItem() }} to {{ $jamKerjas->lastItem() }} of {{ $jamKerjas->total() }} entries
+                    </p>
+                </div>
+                <nav aria-label="Page navigation">
+                    <ul class="pagination pagination-sm mb-0">
+                        {{ $jamKerjas->appends(request()->query())->onEachSide(1)->links() }}
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    @endif
     </div>
 </div>
 @endsection

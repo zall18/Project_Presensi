@@ -11,9 +11,25 @@ use Illuminate\Support\Facades\Validator;
 class UserController extends Controller
 {
     // Display a listing of users
-    public function index()
+    public function index(Request $request)
     {
-        $users = User::all();
+        // $users = User::all();
+        $users = User::paginate(10); // Default pagination
+
+
+        if ($request->level){
+            $users = User::where('level', $request->level)->paginate(10);
+        } elseif ($request->search) {
+            $users = User::where('name', 'like', '%' . $request->search . '%')
+                ->orWhere('email', 'like', '%' . $request->search . '%')
+                ->paginate(10);
+        } elseif ($request->sort && $request->direction) {
+            $users = User::orderBy($request->sort, $request->direction)->paginate(10);
+        } else {
+            $users = User::paginate(10);
+        }
+
+
         // return response()->json($users);
         return view('Managment.User.users', compact('users'));
     }

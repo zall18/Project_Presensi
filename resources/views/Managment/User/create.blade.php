@@ -16,15 +16,15 @@
         <div class="card-body">
             <form action="{{ route('user.store') }}" method="POST">
                 @csrf
-                
+
                 <div class="row g-3">
                     <!-- Username Field -->
                     <div class="col-md-6">
                         <div class="form-floating">
-                            <input type="text" 
-                                   class="form-control @error('name') is-invalid @enderror" 
-                                   id="name" 
-                                   name="name" 
+                            <input type="text"
+                                   class="form-control @error('name') is-invalid @enderror"
+                                   id="name"
+                                   name="name"
                                    placeholder="John Doe"
                                    value="{{ old('name') }}"
                                    required>
@@ -34,14 +34,14 @@
                             @enderror
                         </div>
                     </div>
-                    
+
                     <!-- Email Field -->
                     <div class="col-md-6">
                         <div class="form-floating">
-                            <input type="email" 
-                                   class="form-control @error('email') is-invalid @enderror" 
-                                   id="email" 
-                                   name="email" 
+                            <input type="email"
+                                   class="form-control @error('email') is-invalid @enderror"
+                                   id="email"
+                                   name="email"
                                    placeholder="user@example.com"
                                    value="{{ old('email') }}"
                                    required>
@@ -51,14 +51,14 @@
                             @enderror
                         </div>
                     </div>
-                    
+
                     <!-- Password Field -->
                     <div class="col-md-6">
                         <div class="form-floating">
-                            <input type="password" 
-                                   class="form-control @error('password') is-invalid @enderror" 
-                                   id="password" 
-                                   name="password" 
+                            <input type="password"
+                                   class="form-control @error('password') is-invalid @enderror"
+                                   id="password"
+                                   name="password"
                                    placeholder="Password"
                                    required>
                             <label for="password">Password</label>
@@ -68,26 +68,26 @@
                             <small class="text-muted mt-1 d-block">Minimum 8 characters</small>
                         </div>
                     </div>
-                    
+
                     <!-- Confirm Password Field -->
                     <div class="col-md-6">
                         <div class="form-floating">
-                            <input type="password" 
-                                   class="form-control" 
-                                   id="password_confirmation" 
-                                   name="password_confirmation" 
+                            <input type="password"
+                                   class="form-control"
+                                   id="password_confirmation"
+                                   name="password_confirmation"
                                    placeholder="Confirm Password"
                                    required>
                             <label for="password_confirmation">Confirm Password</label>
                         </div>
                     </div>
-                    
+
                     <!-- Level Field -->
                     <div class="col-md-6">
                         <div class="form-floating">
-                            <select class="form-select @error('level') is-invalid @enderror" 
-                                    id="level" 
-                                    name="level" 
+                            <select class="form-select @error('level') is-invalid @enderror"
+                                    id="level"
+                                    name="level"
                                     required>
                                 <option value="admin" {{ old('level') == 'admin' ? 'selected' : '' }}>Admin</option>
                                 <option value="operator" {{ old('level') == 'operator' ? 'selected' : '' }}>Operator</option>
@@ -99,7 +99,7 @@
                         </div>
                     </div>
                 </div>
-                
+
                 <div class="mt-4 pt-2 border-top">
                     <button type="submit" class="btn btn-primary px-4">
                         <i class="ti ti-user-plus me-1"></i> Create User
@@ -112,32 +112,4 @@
         </div>
     </div>
 </div>
-
-<style>
-    .form-floating {
-        position: relative;
-        margin-bottom: 1rem;
-    }
-    .form-floating > label {
-        color: var(--bs-secondary-color);
-        transition: all 0.2s ease-in-out;
-    }
-    .form-floating > .form-control:focus ~ label,
-    .form-floating > .form-control:not(:placeholder-shown) ~ label,
-    .form-floating > .form-select ~ label {
-        transform: scale(0.85) translateY(-0.5rem) translateX(0.15rem);
-        opacity: 0.8;
-        background: white;
-        padding: 0 0.5rem;
-        color: var(--bs-primary);
-    }
-    .form-control, .form-select {
-        border-radius: 0.375rem;
-        padding: 1rem 0.75rem;
-    }
-    .form-control:focus, .form-select:focus {
-        border-color: var(--bs-primary);
-        box-shadow: 0 0 0 0.25rem rgba(var(--bs-primary-rgb), 0.1);
-    }
-</style>
 @endsection

@@ -85,7 +85,7 @@
               </a>
             </li>
             <li class="sidebar-item">
-              <a class="sidebar-link" href="/waktulibur" aria-expanded="false">
+              <a class="sidebar-link" href="/waktuLibur" aria-expanded="false">
                 <span>
                   <i class="ti ti-circle-off"></i>
                 </span>

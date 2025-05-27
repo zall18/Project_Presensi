@@ -32,8 +32,15 @@ Route::get('/', function () {
 Route::resource('user', UserController::class);
 Route::resource('participant', ParticipantsController::class);
 Route::resource('group', GroupsController::class);
+Route::resource('groupParticipant', GroupParticipantController::class);
+
+Route::get('group/{id}/addParticipant', [GroupsController::class, 'addParticipant'])->name('group.addParticipant');
+
 Route::resource('jamKerja', jamKerjaController::class);
 Route::resource('shift', ShiftController::class);
+
+Route::get('shift/{shift_id}/createDetailShift', [ShiftController::class, 'createDetailShift'])->name('shift.createDetailShift');
+
 Route::resource('detailShift', DetailShiftController::class);
 Route::resource('jadwalParticipant', JadwalParticipantController::class);
 Route::resource('presensi', PresensiController::class);

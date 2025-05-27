@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Group;
+use App\Models\Participant;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -37,15 +38,37 @@ class GroupsController extends Controller
         return redirect()->route('group.index')->with('success', 'Group created successfully');
     }
 
-    // Show a single group
-    public function show($id)
+    public function addParticipant($id)
     {
         $group = Group::find($id);
         if (!$group) {
             return response()->json(['message' => 'Group not found'], 404);
         }
-        // return response()->json($group);
-        return view('Managment.Group.show', compact('group'));
+        $participants = Participant::all();
+        $groupParticipantIds = Group::find($id)->participants()->pluck('participants.id')->toArray();
+        // return response()->json([
+        //     'group' => $group,
+        //     'participants' => $participants,
+        //     'groupParticipants' => $groupParticipants,
+        // ]);
+
+        // return response()->json($participants);
+        return view('Managment.Group.groupParticipant.create', compact('group', 'participants', 'groupParticipantIds'));
+    }
+
+
+    // Show a single group
+    public function show($id)
+    {
+        $group = Group::with('participants')->find($id);
+        if (!$group) {
+            return response()->json(['message' => 'Group not found'], 404);
+        }
+        $participants = $group->participants()->paginate(10);
+
+        // return response()->json([$group]);
+
+        return view('Managment.Group.show', compact('group', 'participants'));
     }
 
     public function edit($id)

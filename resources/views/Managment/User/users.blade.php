@@ -21,10 +21,10 @@
                             <span class="input-group-text bg-transparent">
                                 <i class="ti ti-search"></i>
                             </span>
-                            <input type="text" name="search" class="form-control border-start-0" 
+                            <input type="text" name="search" class="form-control border-start-0"
                                    placeholder="Search users..." value="{{ request('search') }}">
                             @if(request('search'))
-                            <a href="{{ route('user.index', request()->except('search')) }}" 
+                            <a href="{{ route('user.index', request()->except('search')) }}"
                                class="input-group-text bg-transparent text-danger" title="Clear search">
                                 <i class="ti ti-x"></i>
                             </a>
@@ -43,11 +43,11 @@
                 </div>
                 <div class="col-md-3 text-md-end">
                     <div class="text-muted small">
-                        {{-- @if($users->total() > 0)
+                        @if($users->total() > 0)
                         Showing {{ $users->firstItem() }}-{{ $users->lastItem() }} of {{ $users->total() }}
-                        @else --}}
+                        @else
                         No records found
-                        {{-- @endif --}}
+                        @endif
                     </div>
                 </div>
             </div>
@@ -60,7 +60,7 @@
                         <tr>
                             <th class="ps-4">
                                 <a href="{{ route('user.index', [
-                                    'sort' => 'id', 
+                                    'sort' => 'id',
                                     'direction' => request('sort') == 'id' && request('direction') == 'asc' ? 'desc' : 'asc',
                                     'search' => request('search'),
                                     'level' => request('level')
@@ -76,7 +76,7 @@
                             </th>
                             <th>
                                 <a href="{{ route('user.index', [
-                                    'sort' => 'name', 
+                                    'sort' => 'name',
                                     'direction' => request('sort') == 'name' && request('direction') == 'asc' ? 'desc' : 'asc',
                                     'search' => request('search'),
                                     'level' => request('level')
@@ -93,7 +93,7 @@
                             <th>Email</th>
                             <th>
                                 <a href="{{ route('user.index', [
-                                    'sort' => 'level', 
+                                    'sort' => 'level',
                                     'direction' => request('sort') == 'level' && request('direction') == 'asc' ? 'desc' : 'asc',
                                     'search' => request('search'),
                                     'level' => request('level')
@@ -111,9 +111,9 @@
                         </tr>
                     </thead>
                     <tbody class="border-top-0">
-                        @forelse ($users as $user)
+                        @forelse ($users as $key => $user)
                         <tr>
-                            <td class="ps-4 fw-semibold">{{ $user->id }}</td>
+                            <td class="ps-4 fw-semibold">{{ $key +1 }}</td>
                             <td>
                                 <div class="d-flex align-items-center gap-3">
                                     <div class="d-flex flex-column">
@@ -143,7 +143,7 @@
                                     <form action="{{ route('user.destroy', $user->id) }}" method="POST" class="d-inline">
                                         @csrf
                                         @method('DELETE')
-                                        <button type="submit" class="btn btn-sm btn-icon btn-outline-danger rounded-3" 
+                                        <button type="submit" class="btn btn-sm btn-icon btn-outline-danger rounded-3"
                                                 data-bs-toggle="tooltip" title="Delete"
                                                 onclick="return confirm('Are you sure you want to delete this user?')">
                                             <i class="ti ti-trash"></i>
@@ -172,8 +172,8 @@
             </div>
         </div>
 
-        {{-- @if($users->hasPages()) --}}
-        {{-- <div class="card-footer bg-transparent border-0 py-3">
+        @if($users->hasPages())
+        <div class="card-footer bg-transparent border-0 py-3">
             <div class="d-flex flex-column flex-md-row justify-content-between align-items-center">
                 <div class="mb-2 mb-md-0">
                     <p class="small text-muted mb-0">
@@ -187,7 +187,7 @@
                 </nav>
             </div>
         </div>
-        @endif --}}
+        @endif
     </div>
 </div>
 
