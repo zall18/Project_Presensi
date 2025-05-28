@@ -42,7 +42,8 @@ Route::resource('shift', ShiftController::class);
 Route::get('shift/{shift_id}/createDetailShift', [ShiftController::class, 'createDetailShift'])->name('shift.createDetailShift');
 
 Route::resource('detailShift', DetailShiftController::class);
-Route::resource('jadwalParticipant', JadwalParticipantController::class);
+Route::resource('jadwalParticipant', JadwalParticipantController::class)->except(['edit']);
+Route::get('jadwalParticipant/create/{id_shift}', [JadwalParticipantController::class, 'create'])->name('jadwalParticipant.create');
 Route::resource('presensi', PresensiController::class);
 Route::resource('device', DeviceController::class);
 Route::resource('waktuLibur', WaktuLiburController::class);

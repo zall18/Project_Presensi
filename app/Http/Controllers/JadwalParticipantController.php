@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Group;
+use App\Models\Participant;
 use Illuminate\Http\Request;
 use App\Models\JadwalParticipant;
 use App\Models\Shift;
@@ -19,27 +21,80 @@ class JadwalParticipantController extends Controller
     }
 
     // Store a new jadwal participant
+
+    public function create(Request $request)
+    {
+        $shift = Shift::find($request->id_shift);
+        if (!$shift) {
+            // return response()->json(['message' => 'Shift not found'], 404);
+            return redirect()->route('jadwalParticipant.index')->withErrors(['message' => 'Shift not found']);
+        }
+        $grups = Group::all();
+
+        if($request->filter_grup === 'not'){
+            $jadwalParticipants = JadwalParticipant::all();
+            $participants = Participant::whereNotIn('id', $jadwalParticipants->pluck('id'))->get();
+        } else if($request->filter_grup && $request->filter_grup != 'all') {
+            $participants = Group::find($request->filter_grup)->participants;
+        }else{
+            $participants = Participant::all();
+        }
+
+        $jadwalParticipantIds = JadwalParticipant::where('id_shift', $shift->id)
+            ->pluck('id_participant')
+            ->toArray();
+        
+        // return response()->json([
+        //     'shift' => $shift,
+        //     'participants' => $participants,
+        //     'grups' => $grups,
+        //     'participantIds' => $jadwalParticipantIds,
+        //     'doentHaveJadwalParticipant' => $doentHaveJadwalParticipant,
+        // ]);
+
+        return view('Managment.JadwalParticipant.create', compact('shift', 'grups', 'participants', 'jadwalParticipantIds'));
+    }
+
     public function store(Request $request)
     {
+        // dd($request->all());
         $validated = Validator::make($request->all(), [
             'id_shift' => 'required|exists:shifts,id',
-            'id_participant' => 'required|exists:participants,id',
+            // 'id_participant' => 'required|exists:participants,id',
         ]);
         if ($validated->fails()) {
             // return response()->json($validated->errors(), 422);
             return back()->withErrors($validated)->withInput();
         }
         $validated = $validated->validated();
-        // Check if the jadwal participant already exists
-        $existingJadwalParticipant = JadwalParticipant::where('id_shift', $validated['id_shift'])
-            ->where('id_participant', $validated['id_participant'])
-            ->first();
-        if ($existingJadwalParticipant) {
-            // return response()->json(['message' => 'JadwalParticipant already exists'], 422);
-            return back()->withErrors(['message' => 'JadwalParticipant already exists'])->withInput();
+
+        foreach ($request->participants as $participantId) {
+            // Check if the jadwal participant already exists
+            $existingJadwalParticipant = JadwalParticipant::where('id_participant', $participantId)
+                ->first();
+            if ($existingJadwalParticipant) {
+                // return response()->json(['message' => 'JadwalParticipant already exists'], 422);
+                JadwalParticipant::where('id_participant', $participantId)
+                    ->update(['id_shift' => $validated['id_shift']]);
+                continue;
+            }
+
+            JadwalParticipant::create([
+                'id_shift' => $validated['id_shift'],
+                'id_participant' => $participantId,
+            ]);
         }
 
-        $jadwalParticipant = JadwalParticipant::create($validated);
+        // Check if the jadwal participant already exists
+        // $existingJadwalParticipant = JadwalParticipant::where('id_shift', $validated['id_shift'])
+        //     ->where('id_participant', $validated['id_participant'])
+        //     ->first();
+        // if ($existingJadwalParticipant) {
+        //     // return response()->json(['message' => 'JadwalParticipant already exists'], 422);
+        //     return back()->withErrors(['message' => 'JadwalParticipant already exists'])->withInput();
+        // }
+
+        // $jadwalParticipant = JadwalParticipant::create($validated);
 
         // return response()->json($jadwalParticipant->load(['shift', 'participant']), 201);
         return redirect()->route('jadwalParticipant.index')->with('success', 'JadwalParticipant created successfully');

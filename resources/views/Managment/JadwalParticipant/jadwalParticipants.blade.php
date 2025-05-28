@@ -36,7 +36,7 @@
                                 </a>
                             </td> --}}
                             <td class="text-end pe-4">
-                                <a href="" 
+                                <a href="{{ route('jadwalParticipant.create', $shift->id) }}" 
                                    class="btn btn-sm btn-primary d-inline-flex align-items-center gap-1">
                                     <i class="ti ti-user-plus"></i> Pilih Participant
                                 </a>
