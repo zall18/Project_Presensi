@@ -44,9 +44,12 @@ class GroupLiburController extends Controller
     {
         $groupLibur = GroupLibur::with(['waktuLibur', 'group'])->find($id);
         if (!$groupLibur) {
-            return response()->json(['message' => 'GroupLibur not found'], 404);
+            // return response()->json(['message' => 'GroupLibur not found'], 404);
+            return redirect()->route('waktuLibur.index')
+                ->withErrors(['message' => 'Group Libur not found']);
         }
-        return response()->json($groupLibur);
+        // return response()->json($groupLibur);
+        // return view('Managment.GroupLibur.show', compact('groupLibur'));
     }
 
     // Update a group libur
@@ -59,7 +62,8 @@ class GroupLiburController extends Controller
             'id_group' => 'sometimes|required|exists:groups,id',
         ]);
         if ($validated->fails()) {
-            return response()->json($validated->errors(), 422);
+            // return response()->json($validated->errors(), 422);
+            return back()->withErrors($validated)->withInput();
         }
         $validated = $validated->validated();
         // Check if the group libur already exists
@@ -69,24 +73,24 @@ class GroupLiburController extends Controller
                 ->where('id', '!=', $id)
                 ->first();
             if ($existingGroupLibur) {
-                return response()->json(['message' => 'GroupLibur already exists'], 422);
+                // return response()->json(['message' => 'GroupLibur already exists'], 422);
+                return back()->withErrors(['message' => 'Group Libur already exists'])->withInput();
             }
         }
 
         $groupLibur->update($validated);
 
-        return response()->json($groupLibur->load(['waktuLibur', 'group']));
+        // return response()->json($groupLibur->load(['waktuLibur', 'group']));
+        return redirect()->route('waktuLibur.show', $groupLibur->id_waktu_libur)
+            ->with('success', 'Group Libur updated successfully');
     }
 
     // Delete a group libur
-    public function destroy($id)
+    public function destroy($id_group, $id_waktu_libur)
     {
-        $groupLibur = GroupLibur::find($id);
-        if (!$groupLibur) {
-            return response()->json(['message' => 'GroupLibur not found'], 404);
-        }
-        $groupLibur->delete();
+        $waktuLibur = WaktuLibur::findOrFail($id_waktu_libur);
+        $waktuLibur->groups()->detach($id_group);
 
-        return response()->json(['message' => 'GroupLibur deleted']);
+        return redirect()->back()->with('success', 'Group berhasil dihapus dari waktu libur.');
     }
 }

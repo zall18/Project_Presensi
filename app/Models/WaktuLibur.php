@@ -10,8 +10,8 @@ class WaktuLibur extends Model
     use HasFactory;
     protected $guarded = [];
 
-    public function grupLibur()
+    public function groupLibur()
     {
-        return $this->hasMany(GroupLibur::class);
+        return $this->hasMany(GroupLibur::class, 'id_waktu_libur');
     }
 }

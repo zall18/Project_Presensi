@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\WaktuLibur;
+use App\Models\GroupLibur;
+use App\Models\Group;
 use Illuminate\Support\Facades\Validator;
 
 class WaktuLiburController extends Controller
@@ -15,16 +17,18 @@ class WaktuLiburController extends Controller
         // return response()->json($waktuLibur);
         return view('Managment.WaktuLibur.waktuLiburs', compact('waktuLiburs'));
     }
-    
+
     public function create()
     {
         // return response()->json(['message' => 'Create Waktu Libur']);
-        return view('Managment.WaktuLibur.create');
+        $groups = Group::all(); // Assuming you have a Group model
+        return view('Managment.WaktuLibur.create', compact('groups'));
     }
 
     // Store a new waktu libur
     public function store(Request $request)
     {
+        // dd($request->all());
         $validated = Validator::make($request->all(), [
             'nama_libur' => 'required|string|max:255',
             'tanggal_mulai' => 'required|date',
@@ -45,7 +49,16 @@ class WaktuLiburController extends Controller
             return back()->withErrors(['message' => 'WaktuLibur already exists'])->withInput();
         }
 
-        $waktuLibur = WaktuLibur::create($validated);
+        $waktuLiburId = WaktuLibur::create($validated)->id;
+        // Attach groups if provided
+        if ($request->has('groups')) {
+            foreach ($request->groups as $groupId) {
+                GroupLibur::create([
+                    'id_waktu_libur' => $waktuLiburId,
+                    'id_group' => $groupId,
+                ]);
+            }
+        }
 
         // return response()->json($waktuLibur, 201);
         return redirect()->route('waktuLibur.index')->with('success', 'Waktu Libur created successfully');
@@ -54,13 +67,18 @@ class WaktuLiburController extends Controller
     // Show a single waktu libur
     public function show($id)
     {
-        $waktuLibur = WaktuLibur::find($id);
+        $waktuLibur = WaktuLibur::with('groupLibur')->find($id);
         if (!$waktuLibur) {
             // return response()->json(['message' => 'WaktuLibur not found'], 404);
             return redirect()->route('waktuLibur.index')->withErrors(['message' => 'WaktuLibur not found']);
         }
-        // return response()->json($waktuLibur);
-        return view('Managment.WaktuLibur.show', compact('waktuLibur'));
+
+        $groupLibur = $waktuLibur->groupLibur;// Assuming you have a relationship defined in WaktuLibur model
+        $groups = $groupLibur->map(function ($item) {
+            return $item->group; // Assuming you have a relationship defined in GroupLibur model
+        });
+        // return response()->json($groups);
+        return view('Managment.WaktuLibur.show', compact('waktuLibur', 'groups'));
     }
 
     public function edit($id)
@@ -111,8 +129,9 @@ class WaktuLiburController extends Controller
     }
 
     // Delete a waktu libur
-    public function destroy($id)
+    public function destroy($id, $waktuLiburId)
     {
+        dd($id, $waktuLiburId);
         $waktuLibur = WaktuLibur::find($id);
         if (!$waktuLibur) {
             // return response()->json(['message' => 'WaktuLibur not found'], 404);

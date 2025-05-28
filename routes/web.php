@@ -47,3 +47,5 @@ Route::get('jadwalParticipant/create/{id_shift}', [JadwalParticipantController::
 Route::resource('presensi', PresensiController::class);
 Route::resource('device', DeviceController::class);
 Route::resource('waktuLibur', WaktuLiburController::class);
+Route::delete('groupLibur/{id_group}/{id_waktu_libur}/destroy', [GroupLiburController::class, 'destroy'])->name('groupLibur.destroyItem');
+// Route::resource('groupLibur', GroupLiburController::class);
