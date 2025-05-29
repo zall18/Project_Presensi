@@ -22,6 +22,21 @@ class JadwalParticipantController extends Controller
 
     // Store a new jadwal participant
 
+    public function remove(Request $request)
+    {
+        $shift = Shift::find($request->id_shift);
+        if (!$shift) {
+            // return response()->json(['message' => 'Shift not found'], 404);
+            return redirect()->route('jadwalParticipant.index')->withErrors(['message' => 'Shift not found']);
+        }
+        $participants =  Participant::whereHas('jadwalParticipant', function ($query) use ($shift) {
+            $query->where('id_shift', $shift->id);
+        })->get();
+        // return response()->json($participants);
+        return view('Managment.JadwalParticipant.remove', compact('shift', 'participants'));
+    }
+
+
     public function create(Request $request)
     {
         $shift = Shift::find($request->id_shift);
@@ -38,6 +53,12 @@ class JadwalParticipantController extends Controller
             $participants = Group::find($request->filter_grup)->participants;
         }else{
             $participants = Participant::all();
+        }
+
+        if($request->search){
+            $participants = $participants->filter(function($participant) use ($request) {
+                return str_contains(strtolower($participant->nama), strtolower($request->search));
+            });
         }
 
         $jadwalParticipantIds = JadwalParticipant::where('id_shift', $shift->id)
@@ -101,15 +122,27 @@ class JadwalParticipantController extends Controller
     }
 
     // Show a single jadwal participant
-    public function show($id)
+    public function show(Request $request)
     {
-        $jadwalParticipant = JadwalParticipant::with(['shift', 'participant'])->find($id);
-        if (!$jadwalParticipant) {
+        // dd($request->all());
+        $jadwalParticipant = JadwalParticipant::with(['shift', 'participant'])
+            ->where('id_shift', $request->id_shift)
+            ->get();
+        if ($jadwalParticipant->isEmpty()) {
             // return response()->json(['message' => 'JadwalParticipant not found'], 404);
             return redirect()->route('jadwalParticipant.index')->withErrors(['message' => 'JadwalParticipant not found']);
         }
+    
+        $shift = Shift::find($request->id_shift);
+        if (!$shift) {
+            // return response()->json(['message' => 'Shift not found'], 404);
+            return redirect()->route('jadwalParticipant.index')->withErrors(['message' => 'Shift not found']);
+        }
+        $participants =  Participant::whereHas('jadwalParticipant', function ($query) use ($shift) {
+            $query->where('id_shift', $shift->id);
+        })->get();
         // return response()->json($jadwalParticipant);
-        return view('Managment.JadwalParticipant.show', compact('jadwalParticipant'));
+        return view('Managment.JadwalParticipant.show', compact('shift', 'participants', 'jadwalParticipant'));
     }
 
     // Update a jadwal participant
@@ -138,15 +171,24 @@ class JadwalParticipantController extends Controller
     }
 
     // Delete a jadwal participant
-    public function destroy($id)
+    public function destroy(Request $request)
     {
-        $jadwalParticipant = JadwalParticipant::find($id);
-        if (!$jadwalParticipant) {
-            // return response()->json(['message' => 'JadwalParticipant not found'], 404);
-            return redirect()->route('jadwalParticipant.index')->withErrors(['message' => 'JadwalParticipant not found']);
+        // dd($request->all());
+        $validator = Validator::make($request->all(), [
+            'id_shift' => 'required|exists:shifts,id',
+        ]);
+        if ($validator->fails()) {
+            // return response()->json($validated->errors(), 422);
+            return back()->withErrors($validator)->withInput();
         }
-        
-        $jadwalParticipant->delete();
+
+        $validated = $validator->validated();
+
+        foreach ($request->participants as $participantId) {
+            JadwalParticipant::where('id_shift', $validated['id_shift'])
+                ->where('id_participant', $participantId)
+                ->delete();
+        }
 
         // return response()->json(['message' => 'JadwalParticipant deleted']);
         return redirect()->route('jadwalParticipant.index')->with('success', 'JadwalParticipant deleted successfully');

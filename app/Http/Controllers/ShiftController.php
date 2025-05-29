@@ -10,10 +10,29 @@ use Illuminate\Support\Facades\Validator;
 class ShiftController extends Controller
 {
     // List all shifts
-    public function index()
+    public function index(Request $request)
     {
-        $shifts = Shift::with('jamKerja', 'detailShifts')->get();
+        // $shifts = Shift::all();
+        // Pagination
+        $shifts = Shift::with('jamKerja', 'detailShifts')->paginate(10);
+
+        // Search functionality
+        if ($request->search) {
+            $shifts = Shift::where('nama', 'like', '%' . $request->search . '%')
+                ->orWhere('tanggal_mulai', 'like', '%' . $request->search . '%')
+                ->orWhereHas('jamKerja', function ($query) use ($request) {
+                    $query->where('nama', 'like', '%' . $request->search . '%');
+                })
+                ->paginate(10);
+        } elseif ($request->sort && $request->direction) {
+            $shifts = Shift::orderBy($request->sort, $request->direction)->paginate(10);
+        }
+
         // return response()->json($shifts);
+    
+        // $shifts = Shift::with('jamKerja', 'detailShifts')->get();
+        // return response()->json($shifts);
+
         return view('Managment.Shift.shifts', compact('shifts'));
     }
 

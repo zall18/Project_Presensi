@@ -25,9 +25,7 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('dashboard');
-});
+Route::get('/', [UserController::class, 'dashboard'])->name('dashboard');
 
 Route::resource('user', UserController::class);
 Route::resource('participant', ParticipantsController::class);
@@ -42,8 +40,11 @@ Route::resource('shift', ShiftController::class);
 Route::get('shift/{shift_id}/createDetailShift', [ShiftController::class, 'createDetailShift'])->name('shift.createDetailShift');
 
 Route::resource('detailShift', DetailShiftController::class);
-Route::resource('jadwalParticipant', JadwalParticipantController::class)->except(['edit']);
+Route::resource('jadwalParticipant', JadwalParticipantController::class)->except(['edit', 'destroy', 'update', 'show']);
 Route::get('jadwalParticipant/create/{id_shift}', [JadwalParticipantController::class, 'create'])->name('jadwalParticipant.create');
+Route::get('jadwalParticipant/remove/{id_shift}', [JadwalParticipantController::class, 'remove'])->name('jadwalParticipant.remove');
+Route::get('jadwalParticipant/{id_shift}/show', [JadwalParticipantController::class, 'show'])->name('jadwalParticipant.show');
+route::delete('jadwalParticipant/{id_shift}/destroy', [JadwalParticipantController::class, 'destroy'])->name('jadwalParticipant.destroyItem');
 Route::resource('presensi', PresensiController::class);
 Route::resource('device', DeviceController::class);
 Route::resource('waktuLibur', WaktuLiburController::class);

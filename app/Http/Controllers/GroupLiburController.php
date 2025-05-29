@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\WaktuLibur;
 use Illuminate\Http\Request;
 use App\Models\GroupLibur;
 use Illuminate\Support\Facades\Validator;
@@ -88,8 +89,14 @@ class GroupLiburController extends Controller
     // Delete a group libur
     public function destroy($id_group, $id_waktu_libur)
     {
-        $waktuLibur = WaktuLibur::findOrFail($id_waktu_libur);
-        $waktuLibur->groups()->detach($id_group);
+        $waktuLibur = GroupLibur::where('id_group', $id_group)
+            ->where('id_waktu_libur', $id_waktu_libur)
+            ->first();
+        if (!$waktuLibur) {
+            // return response()->json(['message' => 'GroupLibur not found'], 404);
+            return redirect()->back()->withErrors(['message' => 'Group Libur not found']);
+        }
+        $waktuLibur->delete();
 
         return redirect()->back()->with('success', 'Group berhasil dihapus dari waktu libur.');
     }

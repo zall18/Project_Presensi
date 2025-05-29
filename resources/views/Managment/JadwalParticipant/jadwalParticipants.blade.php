@@ -40,6 +40,14 @@
                                    class="btn btn-sm btn-primary d-inline-flex align-items-center gap-1">
                                     <i class="ti ti-user-plus"></i> Pilih Participant
                                 </a>
+                                <a href="{{ route('jadwalParticipant.remove', $shift->id) }}" 
+                                   class="btn btn-sm btn-danger d-inline-flex align-items-center gap-1">
+                                    <i class="ti ti-user-minus"></i> Remove Participant
+                                </a>
+                                <a href="{{ route('jadwalParticipant.show', $shift->id) }}" 
+                                   class="btn btn-sm btn-primary d-inline-flex align-items-center gap-1">
+                                    <i class="ti ti-search"></i> Detail Participant
+                                </a>
                             </td>
                         </tr>
                         @empty

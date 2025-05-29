@@ -7,7 +7,7 @@
             <h3 class="fw-semibold mb-1">Add Participants to Group</h3>
             <p class="text-muted mb-0">Select participants to add to this group</p>
         </div>
-        <a href="{{ route('groupParticipant.index') }}" class="btn btn-outline-secondary">
+        <a href="{{ route('group.show', $group->id) }}" class="btn btn-outline-secondary">
             <i class="ti ti-arrow-left me-1"></i> Back to Group List
         </a>
     </div>

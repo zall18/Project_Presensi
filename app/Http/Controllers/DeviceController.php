@@ -9,9 +9,21 @@ use Illuminate\Support\Facades\Validator;
 class DeviceController extends Controller
 {
     // List all devices
-    public function index()
+    public function index(Request $request)
     {
-        $devices = Device::all();
+        // Check if there are any filters or search criteria
+        if ($request->has('search')) {
+            $search = $request->input('search');
+            $devices = Device::where('nama', 'like', "%{$search}%")
+                ->orWhere('device_id', 'like', "%{$search}%")
+                ->orWhere('lokasi', 'like', "%{$search}%")
+                ->paginate(10);
+        } elseif ($request->sort && $request->direction) {
+            $devices = Device::orderBy($request->sort, $request->direction)->paginate(10);
+        } else {
+            $devices = Device::paginate(10); // Default pagination
+        }
+
         // return response()->json($devices);
         return view('Managment.Device.devices', compact('devices'));
     }
@@ -53,6 +65,17 @@ class DeviceController extends Controller
         }
         // return response()->json($device);
         return view('Managment.Device.show', compact('device'));
+    }
+
+    public function edit($id)
+    {
+        $device = Device::find($id);
+        if (!$device) {
+            // return response()->json(['message' => 'Device not found'], 404);
+            return redirect()->route('device.index')->withErrors(['message' => 'Device not found']);
+        }
+        // return response()->json($device);
+        return view('Managment.Device.edit', compact('device'));
     }
 
     // Update a device

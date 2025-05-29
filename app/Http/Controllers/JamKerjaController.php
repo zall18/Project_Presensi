@@ -86,9 +86,11 @@ class JamKerjaController extends Controller
     {
         $jamKerja = JamKerja::find($id);
         if (!$jamKerja) {
-            return response()->json(['message' => 'JamKerja not found'], 404);
+            // return response()->json(['message' => 'JamKerja not found'], 404);
+            return redirect()->route('jamKerja.index')->withErrors(['message' => 'JamKerja not found']);
         }
-        return response()->json($jamKerja);
+        // return response()->json($jamKerja);
+        return view('Managment.JamKerja.show', compact('jamKerja'));
     }
 
     public function edit($id)

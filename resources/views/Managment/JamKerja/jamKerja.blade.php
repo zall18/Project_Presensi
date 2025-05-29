@@ -100,6 +100,9 @@
                             <td>{{ $jamKerja->jam_pulang }}</td>
                             <td class="text-end pe-4">
                                 <div class="d-flex gap-2 justify-content-end">
+                                    <a href="{{ route('jamKerja.show', $jamKerja->id) }}" class="btn btn-sm btn-icon btn-outline-info rounded-3" data-bs-toggle="tooltip" title="View">
+                                        <i class="ti ti-eye"></i>
+                                    </a>
                                     <a href="{{ route('jamKerja.edit', $jamKerja->id) }}" class="btn btn-sm btn-icon btn-outline-primary rounded-3" data-bs-toggle="tooltip" title="Edit">
                                         <i class="ti ti-pencil"></i>
                                     </a>

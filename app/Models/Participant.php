@@ -11,11 +11,6 @@ class Participant extends Model
 
     protected $guarded = [];
 
-    public function groups()
-    {
-        return $this->belongsToMany(Group::class, 'group_participants', 'id_participant', 'id_group');
-    }
-
     public function jadwalParticipant()
     {
         return $this->hasOne(JadwalParticipant::class, 'id_participant');
@@ -23,7 +18,7 @@ class Participant extends Model
 
     public function groupParticipants()
     {
-        return $this->hasMany(GroupParticipant::class, 'id_participant');
+        return $this->hasOne(GroupParticipant::class, 'id_participant');
     }
 
     public function presensi()

@@ -58,15 +58,28 @@ class GroupsController extends Controller
 
 
     // Show a single group
-    public function show($id)
+    public function show(Request $request, $id)
     {
         $group = Group::with('participants')->find($id);
         if (!$group) {
             return response()->json(['message' => 'Group not found'], 404);
         }
-        $participants = $group->participants()->paginate(10);
+        $participantsQuery = $group->participants();
 
-        // return response()->json([$group]);
+        if ($request->search) {
+            $participantsQuery->where(function($q) use ($request) {
+                $q->where('nama', 'like', '%' . $request->search . '%')
+                ->orWhere('no_induk', 'like', '%' . $request->search . '%')
+                ->orWhere('id_kartu', 'like', '%' . $request->search . '%');
+            });
+        }
+
+        if ($request->sort && $request->direction) {
+            $participantsQuery->orderBy($request->sort, $request->direction);
+        }
+
+        $participants = $participantsQuery->paginate(10);
+
 
         return view('Managment.Group.show', compact('group', 'participants'));
     }

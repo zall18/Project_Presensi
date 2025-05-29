@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Group;
 use App\Models\Presensi;
 use App\Models\Participant;
 use Carbon\Carbon;
@@ -12,8 +13,35 @@ class PresensiController extends Controller
     // Show all presensi records
     public function index(Request $request)
     {
-        $presensis = Presensi::with('participant')->orderBy('created_at', 'desc')->get();
-        return view('managment.presensi.presensis', compact('presensis'));
+        // $presensis = Presensi::with('participant')->orderBy('created_at', 'desc')->get();
+        $groups = Group::all();
+        if ($request->group){
+            $groupId = $request->input('group');
+            $presensis = Presensi::with('participant')
+                ->whereHas('participant.groupParticipants', function ($query) use ($groupId) {
+                    $query->where('id_group', $groupId);
+                })
+                ->paginate(10);
+        } else if($request->date_filter){
+            $date = Carbon::parse($request->date_filter);
+            $presensis = Presensi::with('participant')
+                ->whereDate('waktu_masuk', $date)
+                ->orderBy('created_at', 'desc')
+                ->paginate(10);
+        } else if ($request->group && $request->date_filter) {
+            $groupId = $request->input('group');
+            $date = Carbon::parse($request->date_filter);
+            $presensis = Presensi::with('participant')
+                ->whereHas('participant.groupParticipants', function ($query) use ($groupId) {
+                    $query->where('id_group', $groupId);
+                })
+                ->whereDate('waktu_masuk', $date)
+                ->orderBy('created_at', 'desc')
+                ->paginate(10);
+        } else {
+            $presensis = Presensi::with('participant')->orderBy('created_at', 'desc')->paginate(10);
+        }
+        return view('managment.presensi.presensis', compact('presensis', 'groups'));
     }
 
     // Show a single presensi record

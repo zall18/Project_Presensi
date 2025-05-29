@@ -79,7 +79,21 @@
                                     @endif
                                 </a>
                             </th>
-                            <th>Tanggal Mulai</th>
+                            <th>
+                                <a href="{{ route('waktuLibur.index', [
+                                    'sort' => 'tanggal_mulai',
+                                    'direction' => request('sort') == 'tanggal_mulai' && request('direction') == 'asc' ? 'desc' : 'asc',
+                                    'search' => request('search'),
+                                ]) }}" class="text-decoration-none text-dark d-flex align-items-center gap-1">
+                                    <span>Tanggal Mulai</span>
+                                    @if(request('sort') == 'tanggal_mulai')
+                                    <i class="ti ti-arrows-sort fs-4 text-primary"></i>
+                                    <i class="ti ti-arrow-{{ request('direction') == 'asc' ? 'up' : 'down' }} fs-4 text-primary"></i>
+                                    @else
+                                    <i class="ti ti-arrows-sort fs-4 text-muted opacity-50"></i>
+                                    @endif
+                                </a>
+                            </th>
                             <th>Tanggal Selesai</th>
                             <th class="text-end pe-4">Actions</th>
                         </tr>

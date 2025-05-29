@@ -2,14 +2,30 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Group;
+use App\Models\Participant;
+use App\Models\Presensi;
+use App\Models\Shift;
 use App\Models\User;
-
+use App\Models\WaktuLibur;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 
 class UserController extends Controller
 {
+
+    public function dashboard()
+    {
+        // Assuming you want to return a view for the dashboard
+        $totalParticipants = Participant::count();
+        $totalShifts = Shift::count();
+        $totalGroups = Group::count();
+        $presensis = Presensi::orderBy('created_at', 'desc')->take(10)->get();
+        $waktuLiburs = WaktuLibur::orderBy('tanggal_mulai', 'desc')->take(3)->get();
+        return view('dashboard', compact('totalParticipants', 'totalShifts', 'totalGroups', 'presensis', 'waktuLiburs'));
+    }
+
     // Display a listing of users
     public function index(Request $request)
     {
@@ -28,6 +44,8 @@ class UserController extends Controller
         } else {
             $users = User::paginate(10);
         }
+
+    
 
 
         // return response()->json($users);
@@ -65,9 +83,11 @@ class UserController extends Controller
     {
         $user = User::find($id);
         if (!$user) {
-            return response()->json(['message' => 'User not found'], 404);
+            // return response()->json(['message' => 'User not found'], 404);
+            return redirect()->route('user.index')->withErrors(['message' => 'User not found']);
         }
-        return response()->json($user);
+        // return response()->json($user);
+        return view('Managment.User.show', compact('user'));
     }
 
     public function edit($id)

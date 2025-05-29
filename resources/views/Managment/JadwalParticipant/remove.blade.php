@@ -4,35 +4,13 @@
 <div class="container mt-4">
     <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-4 gap-3">
         <div>
-            <h3 class="fw-semibold mb-1">Add new Jadwal Participant</h3>
-            <p class="text-muted mb-0">Pilih shift yang akan diatur untuk participant ini.</p>
+            <h3 class="fw-semibold mb-1">Remove Participant from Jadwal Participant</h3>
+            <p class="text-muted mb-0">Pilih Participant yang akan hapus dari jadwal.</p>
         </div>
         <a href="{{ route('jadwalParticipant.index') }}" class="btn btn-outline-secondary">
             <i class="ti ti-arrow-left me-1"></i> Back to Jadwal Participant
         </a>
     </div>
-    <form>
-        <div class="mb-3">
-            <label for="nama" class="form-label">Pilih berdasarkan grup</label>
-            <select class="form-select" id="filter" name="filter_grup">
-                <option value="all" {{ request('filter_grup') === 'all' ? 'selected' : ''}}>Semua Participant</option>
-                <option value="not" {{ request('filter_grup') === 'not' ? 'selected' : ''}}>Belum Masuk Jadwal</option>
-                @foreach ($grups as $grup)
-                    <option value="{{ $grup->id }}" {{ request('filter_grup') == (string) $grup->id ? 'selected' : '' }} >{{ $grup->nama }}</option>
-                @endforeach
-            </select>
-        </div>
-        <script>
-            document.addEventListener('DOMContentLoaded', function() {
-                document.getElementById('filter').addEventListener('change', function() {
-                    this.form.submit();
-                });
-            });
-        </script>
-            
-            </select>
-        </div>
-    </form>
     <div class="card shadow-sm border-0 overflow-hidden">
         <div class="card-header bg-transparent border-0 pt-3 pb-2">
             <div class="row g-3">
@@ -72,8 +50,9 @@
             </div>
         </div>
 
-        <form action="{{ route('jadwalParticipant.store') }}" method="POST">
+        <form action="{{ route('jadwalParticipant.destroyItem', $shift->id) }}" method="POST">
             @csrf
+            @method('DELETE')
             <input type="hidden" name="id_shift" value="{{ $shift->id }}">
             <div class="card-body p-0">
                 <div class="table-responsive">
@@ -176,8 +155,8 @@
                 </div>
             </div>
             <div class="mt-4 pt-2 border-top">
-                    <button type="submit" class="btn btn-primary px-4">
-                        <i class="ti ti-users-plus me-1"></i> Save Group Participants
+                    <button type="submit" class="btn btn-danger px-4">
+                        <i class="ti ti-users-plus me-1"></i> Remove Group Participants
                     </button>
                     <a href="{{ route('jadwalParticipant.index') }}" class="btn btn-outline-secondary ms-2">
                         <i class="ti ti-reload me-1"></i> Cancel

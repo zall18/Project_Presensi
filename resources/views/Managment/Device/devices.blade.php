@@ -79,7 +79,7 @@
                                     @endif
                                 </a>
                             </th>
-                            <th>IP Address</th>
+                            <th>Device ID</th>
                             <th>Lokasi</th>
                             <th class="text-end pe-4">Actions</th>
                         </tr>
@@ -89,7 +89,7 @@
                         <tr>
                             <td class="ps-4 fw-semibold">{{ $device->id }}</td>
                             <td>{{ $device->nama }}</td>
-                            <td>{{ $device->ip_address }}</td>
+                            <td>{{ $device->device_id }}</td>
                             <td>{{ $device->lokasi }}</td>
                             <td class="text-end pe-4">
                                 <div class="d-flex gap-2 justify-content-end">

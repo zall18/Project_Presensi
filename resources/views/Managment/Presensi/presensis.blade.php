@@ -5,42 +5,53 @@
 <div class="container mt-4">
     <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-4 gap-3">
         <div>
-            <h3 class="fw-semibold mb-1">Presensi Management</h3>
-            <p class="text-muted mb-0">Manage all presensi records in the system</p>
+            <h3 class="fw-semibold mb-1">History Presensi</h3>
+            <p class="text-muted mb-0">all presensi records in the system</p>
         </div>
     </div>
 
     <div class="card shadow-sm border-0 overflow-hidden">
         <div class="card-header bg-transparent border-0 pt-3 pb-2">
+            <form action="{{ route('presensi.index') }}" method="GET">
             <div class="row g-3">
-                <div class="col-md-6">
-                    <form action="{{ route('presensi.index') }}" method="GET">
-                        <div class="input-group input-group-merge">
-                            <span class="input-group-text bg-transparent">
-                                <i class="ti ti-search"></i>
-                            </span>
-                            <input type="text" name="search" class="form-control border-start-0"
-                                   placeholder="Search presensi..." value="{{ request('search') }}">
-                            @if(request('search'))
-                            <a href="{{ route('presensi.index', request()->except('search')) }}"
-                               class="input-group-text bg-transparent text-danger" title="Clear search">
-                                <i class="ti ti-x"></i>
+                    <div class="col-md-3">
+                        <select name="group" class="form-select">
+                            <option value="">All Group</option>
+                            @foreach ($groups as $group)
+                                <option value="{{ $group->id }}" {{ request('group') == $group->id ? 'selected' : '' }}>
+                                    {{ $group->nama }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <input type="date" name="date_filter" id="date_filter" class="form-control" placeholder="Filter by date" value="{{ request('date_filter') }}">
+                               
+                    </div>
+                    <div class="col-md-1">
+                        <button type="submit" class="btn btn-primary mt-2">Filter</button>
+                    </div>
+                    <div class="col-md-2">
+                        @if(request('group') || request('date_filter'))
+                            <a href="{{ route('presensi.index', request()->except('group', 'date_filter')) }}"
+                               class="btn btn-danger mt-2" title="Clear search">
+                                Clear Filter
                             </a>
+                        @endif
+                    </div>
+                    <div class="col-md-3 text-md-end">
+                        <div class="text-muted small">
+                            @if($presensis->total() > 0)
+                            Showing {{ $presensis->firstItem() }}-{{ $presensis->lastItem() }} of {{ $presensis->total() }}
+                            @else
+                            No records found
                             @endif
                         </div>
-                    </form>
-                </div>
-                <div class="col-md-6 text-md-end">
-                    <div class="text-muted small">
-                        {{-- @if($presensis->total() > 0)
-                        Showing {{ $presensis->firstItem() }}-{{ $presensis->lastItem() }} of {{ $presensis->total() }}
-                        @else --}}
-                        No records found
-                        {{-- @endif --}}
                     </div>
-                </div>
-            </div>
+                </form>
         </div>
+            </div>
+
 
         <div class="card-body p-0">
             <div class="table-responsive">
@@ -48,34 +59,10 @@
                     <thead class="table-light text-nowrap">
                         <tr>
                             <th class="ps-4">
-                                <a href="{{ route('presensi.index', [
-                                    'sort' => 'id',
-                                    'direction' => request('sort') == 'id' && request('direction') == 'asc' ? 'desc' : 'asc',
-                                    'search' => request('search'),
-                                ]) }}" class="text-decoration-none text-dark d-flex align-items-center gap-1">
-                                    <span>ID</span>
-                                    @if(request('sort') == 'id')
-                                    <i class="ti ti-arrows-sort fs-4 text-primary"></i>
-                                    <i class="ti ti-arrow-{{ request('direction') == 'asc' ? 'up' : 'down' }} fs-4 text-primary"></i>
-                                    @else
-                                    <i class="ti ti-arrows-sort fs-4 text-muted opacity-50"></i>
-                                    @endif
-                                </a>
+                                ID
                             </th>
                             <th>
-                                <a href="{{ route('presensi.index', [
-                                    'sort' => 'participant_nama',
-                                    'direction' => request('sort') == 'participant_nama' && request('direction') == 'asc' ? 'desc' : 'asc',
-                                    'search' => request('search'),
-                                ]) }}" class="text-decoration-none text-dark d-flex align-items-center gap-1">
-                                    <span>Participant</span>
-                                    @if(request('sort') == 'participant_nama')
-                                    <i class="ti ti-arrows-sort fs-4 text-primary"></i>
-                                    <i class="ti ti-arrow-{{ request('direction') == 'asc' ? 'up' : 'down' }} fs-4 text-primary"></i>
-                                    @else
-                                    <i class="ti ti-arrows-sort fs-4 text-muted opacity-50"></i>
-                                    @endif
-                                </a>
+                                Participant
                             </th>
                             <th>Waktu Masuk</th>
                             <th>Waktu Keluar</th>
@@ -93,21 +80,10 @@
                             <td>{{ $presensi->device->nama }}</td>
                             <td class="text-end pe-4">
                                 <div class="d-flex gap-2 justify-content-end">
-                                    <a href="{{ route('presensi.show', $presensi->id) }}" class="btn btn-sm btn-icon btn-outline-info rounded-3" data-bs-toggle="tooltip" title="View">
-                                        <i class="ti ti-eye"></i>
+                                    <a href="{{ route('participant.show', $presensi->participant->id) }}" 
+                                    class="btn btn-sm btn-primary d-inline-flex align-items-center gap-1">
+                                        <i class="ti ti-search"></i> Detail Participant
                                     </a>
-                                    <a href="{{ route('presensi.edit', $presensi->id) }}" class="btn btn-sm btn-icon btn-outline-primary rounded-3" data-bs-toggle="tooltip" title="Edit">
-                                        <i class="ti ti-pencil"></i>
-                                    </a>
-                                    <form action="{{ route('presensi.destroy', $presensi->id) }}" method="POST" class="d-inline">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="btn btn-sm btn-icon btn-outline-danger rounded-3"
-                                                data-bs-toggle="tooltip" title="Delete"
-                                                onclick="return confirm('Are you sure you want to delete this presensi?')">
-                                            <i class="ti ti-trash"></i>
-                                        </button>
-                                    </form>
                                 </div>
                             </td>
                         </tr>
@@ -130,10 +106,22 @@
                 </table>
             </div>
         </div>
-        {{-- Pagination --}}
-        {{-- <div class="d-flex justify-content-end mt-3">
-            {{ $presensis->links() }}
-        </div> --}}
-    </div>
+        
+    @if($presensis->hasPages())
+        <div class="card-footer bg-transparent border-0 py-3">
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-center">
+                <div class="mb-2 mb-md-0">
+                    <p class="small text-muted mb-0">
+                        Showing {{ $presensis->firstItem() }} to {{ $presensis->lastItem() }} of {{ $presensis->total() }} entries
+                    </p>
+                </div>
+                <nav aria-label="Page navigation">
+                    <ul class="pagination pagination-sm mb-0">
+                        {{ $presensis->appends(request()->query())->onEachSide(1)->links() }}
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    @endif
 </div>
 @endsection

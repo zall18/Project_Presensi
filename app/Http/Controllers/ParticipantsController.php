@@ -25,6 +25,8 @@ class ParticipantsController extends Controller
             $participants = Participant::paginate(10);
         }
 
+
+
         // return response()->json($participants);
         return view('Managment.Participant.participants', compact('participants'));
     }
@@ -61,13 +63,15 @@ class ParticipantsController extends Controller
     // Show a single participant
     public function show($id)
     {
-        $participant = Participant::find($id);
+        $participant = Participant::with('groupParticipants')->find($id);
         if (!$participant) {
             return response()->json(['message' => 'Participant not found'], 404);
         }
+        $presensis = $participant->presensi;
+        // return response()->json($presensis);
 
         // return response()->json($participant);
-        return view('Managment.Participant.show', compact('participant'));
+        return view('Managment.Participant.show', compact('participant', 'presensis'));
     }
 
     // show a participant by id_kartu

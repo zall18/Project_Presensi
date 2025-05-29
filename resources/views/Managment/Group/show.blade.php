@@ -31,7 +31,7 @@
         <div class="card-header bg-transparent border-0 pt-3 pb-2">
             <div class="row g-3">
                 <div class="col-md-6">
-                    <form action="{{ route('participant.index') }}" method="GET">
+                    <form action="{{ route('group.show', $group->id) }}" method="GET">
                         <div class="input-group input-group-merge">
                             <span class="input-group-text bg-transparent">
                                 <i class="ti ti-search"></i>
@@ -39,7 +39,13 @@
                             <input type="text" name="search" class="form-control border-start-0"
                                 placeholder="Search participants..." value="{{ request('search') }}">
                             @if(request('search'))
-                            <a href="{{ route('participant.index', request()->except('search')) }}"
+                            <a href="{{ route('group.show', [
+                                'group' => $group->id,
+                                'sort' => request('sort'),
+                                'direction' => request('direction'),
+                                'search' => null,
+                                
+                            ]) }}"
                             class="input-group-text bg-transparent text-danger" title="Clear search">
                                 <i class="ti ti-x"></i>
                             </a>
@@ -66,7 +72,8 @@
                     <thead class="table-light text-nowrap">
                         <tr>
                             <th class="ps-4">
-                                <a href="{{ route('participant.index', [
+                                <a href="{{ route('group.show', [
+                                    'group' => $group->id,
                                     'sort' => 'id',
                                     'direction' => request('sort') == 'id' && request('direction') == 'asc' ? 'desc' : 'asc',
                                     'search' => request('search'),
@@ -81,7 +88,8 @@
                                 </a>
                             </th>
                             <th>
-                                <a href="{{ route('participant.index', [
+                                <a href="{{ route('group.show', [
+                                    'group' => $group->id,
                                     'sort' => 'nama',
                                     'direction' => request('sort') == 'nama' && request('direction') == 'asc' ? 'desc' : 'asc',
                                     'search' => request('search'),
@@ -141,7 +149,7 @@
                                     <i class="ti ti-users-off fs-5 text-muted mb-2"></i>
                                     <span class="text-muted">No participants found</span>
                                     @if(request('search'))
-                                    <a href="{{ route('participant.index') }}" class="btn btn-sm btn-outline-primary mt-3">
+                                    <a href="{{ route('group.show', $group->id) }}" class="btn btn-sm btn-outline-primary mt-3">
                                         Clear filters
                                     </a>
                                     @endif

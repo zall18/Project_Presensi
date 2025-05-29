@@ -11,9 +11,20 @@ use Illuminate\Support\Facades\Validator;
 class WaktuLiburController extends Controller
 {
     // List all waktu libur
-    public function index()
+    public function index(Request $request)
     {
-        $waktuLiburs = WaktuLibur::all();
+        if($request->has('search')) {
+            $search = $request->input('search');
+            $waktuLiburs = WaktuLibur::where('nama_libur', 'like', "%{$search}%")
+                ->orWhere('tanggal_mulai', 'like', "%{$search}%")
+                ->orWhere('tanggal_akhir', 'like', "%{$search}%")
+                ->paginate(10);
+        } else if($request->sort && $request->direction) {
+            $waktuLiburs = WaktuLibur::orderBy($request->sort, $request->direction)->paginate(10);
+        } else {
+            $waktuLiburs = WaktuLibur::paginate(10);
+        }
+
         // return response()->json($waktuLibur);
         return view('Managment.WaktuLibur.waktuLiburs', compact('waktuLiburs'));
     }
@@ -83,18 +94,25 @@ class WaktuLiburController extends Controller
 
     public function edit($id)
     {
-        $waktuLibur = WaktuLibur::find($id);
+        $waktuLibur = WaktuLibur::with('groupLibur')->find($id);
         if (!$waktuLibur) {
             // return response()->json(['message' => 'WaktuLibur not found'], 404);
             return redirect()->route('waktuLibur.index')->withErrors(['message' => 'WaktuLibur not found']);
         }
-        // return response()->json($waktuLibur);
-        return view('Managment.WaktuLibur.edit', compact('waktuLibur'));
+
+        $groupLibur = $waktuLibur->groupLibur;// Assuming you have a relationship defined in WaktuLibur model
+        $groups = Group::all(); // Get all groups to show in the form
+
+        $selectedGroups = $groupLibur->pluck('id_group')->toArray(); // Get the IDs of the groups associated with this waktu libur
+
+        // return response()->json($selectedGroups);
+        return view('Managment.WaktuLibur.edit', compact('waktuLibur', 'groups', 'selectedGroups'));
     }
 
     // Update a waktu libur
     public function update(Request $request, $id)
     {
+        // dd($request->all());
         $waktuLibur = WaktuLibur::find($id);
         if (!$waktuLibur) {
             // return response()->json(['message' => 'WaktuLibur not found'], 404);
@@ -123,6 +141,15 @@ class WaktuLiburController extends Controller
         }
 
         $waktuLibur->update($validated);
+
+        if ($request->has('groups')) {
+            foreach ($request->groups as $groupId) {
+                GroupLibur::create([
+                    'id_waktu_libur' => $id,
+                    'id_group' => $groupId,
+                ]);
+            }
+        }
 
         // return response()->json($waktuLibur);
         return redirect()->route('waktuLibur.index')->with('success', 'Waktu Libur updated successfully');
