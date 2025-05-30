@@ -134,13 +134,13 @@
                             </td>
                             <td class="text-end pe-4">
                                 <div class="d-flex gap-2 justify-content-end">
-                                    <a href="{{ route('user.show', $user->id) }}" class="btn btn-sm btn-icon btn-outline-info rounded-3" data-bs-toggle="tooltip" title="View">
+                                    <a href="{{ route('user.show', Crypt::encrypt($user->id)) }}" class="btn btn-sm btn-icon btn-outline-info rounded-3" data-bs-toggle="tooltip" title="View">
                                         <i class="ti ti-eye"></i>
                                     </a>
-                                    <a href="{{ route('user.edit', $user->id) }}" class="btn btn-sm btn-icon btn-outline-primary rounded-3" data-bs-toggle="tooltip" title="Edit">
+                                    <a href="{{ route('user.edit', Crypt::encrypt($user->id)) }}" class="btn btn-sm btn-icon btn-outline-primary rounded-3" data-bs-toggle="tooltip" title="Edit">
                                         <i class="ti ti-pencil"></i>
                                     </a>
-                                    <form action="{{ route('user.destroy', $user->id) }}" method="POST" class="d-inline">
+                                    <form action="{{ route('user.destroy', Crypt::encrypt($user->id)) }}" method="POST" class="d-inline">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" class="btn btn-sm btn-icon btn-outline-danger rounded-3"

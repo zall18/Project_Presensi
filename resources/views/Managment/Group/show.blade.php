@@ -22,9 +22,14 @@
             <h3 class="fw-semibold mb-1">Group Participant</h3>
             <p class="text-muted mb-0">Manage all group participant in the system</p>
         </div>
-        <a href="{{ route('group.addParticipant', $group->id) }}" class="btn btn-success d-flex align-items-center">
-            <i class="ti ti-plus me-1"></i> Add/Update Group Participant
-        </a>
+        <div>
+            <a href="{{ route('group.addParticipant', $group->id) }}" class="btn btn-success d-flex align-items-center">
+                <i class="ti ti-plus me-1"></i> Add/Update Group Participant
+            </a>
+            <a href="{{ route('group.addParticipant', $group->id) }}" class="btn btn-danger d-flex align-items-center mt-2">
+                <i class="ti ti-minus me-1"></i> Remove Group Participant
+            </a>
+        </div>
     </div>
 
     <div class="card shadow-sm border-0 overflow-hidden">
@@ -44,7 +49,7 @@
                                 'sort' => request('sort'),
                                 'direction' => request('direction'),
                                 'search' => null,
-                                
+
                             ]) }}"
                             class="input-group-text bg-transparent text-danger" title="Clear search">
                                 <i class="ti ti-x"></i>
@@ -107,7 +112,7 @@
                             <th>ID Kartu</th>
                             <th>No HP</th>
                             <th>Alamat</th>
-                            <th class="text-end pe-4">Actions</th>
+
                         </tr>
                     </thead>
                     <tbody class="border-top-0">
@@ -126,20 +131,7 @@
                             <td>{{ $participant->id_kartu }}</td>
                             <td>{{ $participant->no_hp }}</td>
                             <td>{{ $participant->alamat }}</td>
-                            <td class="text-end pe-4">
-                                <div class="d-flex gap-2 justify-content-end">
-                                    <form action="{{ route('groupParticipant.destroy', $participant->id) }}" method="POST" class="d-inline">
-                                        @csrf
-                                        @method('DELETE')
-                                        <input type="hidden" name="group_id" value="{{ $group->id }}">
-                                        <button type="submit" class="btn btn-sm btn-icon btn-outline-danger rounded-3"
-                                                data-bs-toggle="tooltip" title="Delete"
-                                                onclick="return confirm('Are you sure you want to delete this participant?')">
-                                            <i class="ti ti-trash"></i>
-                                        </button>
-                                    </form>
-                                </div>
-                            </td>
+
 
                         </tr>
                         @empty

@@ -41,7 +41,7 @@
                 </div>
             </div>
             <div class="mt-4 pt-2 border-top d-flex justify-content-end gap-2">
-                <a href="{{ route('participant.edit', $participant->id) }}" class="btn btn-primary">
+                <a href="{{ route('participant.edit', Crypt::encrypt($participant->id)) }}" class="btn btn-primary">
                     <i class="ti ti-edit me-1"></i> Edit
                 </a>
                 <a href="{{ route('participant.index') }}" class="btn btn-outline-secondary">

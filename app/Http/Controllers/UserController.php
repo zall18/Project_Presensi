@@ -11,6 +11,10 @@ use App\Models\WaktuLibur;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Crypt;
+use RealRashid\SweetAlert\Facades\Alert;
+
+
 
 class UserController extends Controller
 {
@@ -45,7 +49,7 @@ class UserController extends Controller
             $users = User::paginate(10);
         }
 
-    
+
 
 
         // return response()->json($users);
@@ -74,6 +78,8 @@ class UserController extends Controller
         $validated = $validator->validated();
         $validated['password'] = Hash::make($validated['password']);
         $user = User::create($validated);
+        Alert::success('Berhasil!', 'User berhasil ditambahkan 🎉');
+
         // return response()->json($user, 201);
         return redirect()->route('user.index')->with('success', 'User created successfully');
     }
@@ -81,7 +87,8 @@ class UserController extends Controller
     // Display the specified user
     public function show($id)
     {
-        $user = User::find($id);
+        $userId = Crypt::decrypt($id);
+        $user = User::find($userId);
         if (!$user) {
             // return response()->json(['message' => 'User not found'], 404);
             return redirect()->route('user.index')->withErrors(['message' => 'User not found']);
@@ -92,7 +99,8 @@ class UserController extends Controller
 
     public function edit($id)
     {
-        $user = User::find($id);
+        $userId = Crypt::decrypt($id);
+        $user = User::find($userId);
         if (!$user) {
             return response()->json(['message' => 'User not found'], 404);
         }
@@ -103,7 +111,8 @@ class UserController extends Controller
     // Update the specified user
     public function update(Request $request, $id)
     {
-        $user = User::find($id);
+        $userId = Crypt::decrypt($id);
+        $user = User::find($userId);
         if (!$user) {
             return response()->json(['message' => 'User not found'], 404);
         }
@@ -116,7 +125,8 @@ class UserController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return response()->json($validator->errors(), 422);
+            // return response()->json($validator->errors(), 422);
+            
         }
 
         $validated = $validator->validate();
@@ -125,18 +135,23 @@ class UserController extends Controller
         }
 
         $user->update($validated);
+        Alert::success('Berhasil!', 'User berhasil diubah 🎉');
 
-        return response()->json($user);
+
+        // return response()->json($user);
+        return redirect()->route('user.index')->with('success', 'User created successfully');return view(route('user.index'));
     }
 
     // Remove the specified user
     public function destroy($id)
     {
-        $user = User::find($id);
+        $userId = Crypt::decrypt($id);
+        $user = User::find($userId);
         if (!$user) {
             return response()->json(['message' => 'User not found'], 404);
         }
         $user->delete();
+        Alert::success('Berhasil!', 'User berhasil dihapus 🎉');
 
         return back()->with('success', 'User deleted successfully');
     }

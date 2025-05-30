@@ -5,6 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\Participant;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Crypt;
+use RealRashid\SweetAlert\Facades\Alert;
+
 
 class ParticipantsController extends Controller
 {
@@ -54,6 +57,7 @@ class ParticipantsController extends Controller
         }
         $validated = $validated->validated();
         $participant = Participant::create($validated);
+        Alert::success('Berhasil!', 'Participant berhasil ditambahkan 🎉');
 
         // return response()->json($participant, 201);
         // return back()->with('success', 'Participant created successfully');
@@ -63,7 +67,8 @@ class ParticipantsController extends Controller
     // Show a single participant
     public function show($id)
     {
-        $participant = Participant::with('groupParticipants')->find($id);
+        $participantId = Crypt::decrypt($id);
+        $participant = Participant::with('groupParticipants')->find($participantId);
         if (!$participant) {
             return response()->json(['message' => 'Participant not found'], 404);
         }
@@ -88,7 +93,8 @@ class ParticipantsController extends Controller
 
     public function edit($id)
     {
-        $participant = Participant::find($id);
+        $participantId = Crypt::decrypt($id);
+        $participant = Participant::find($participantId);
         if (!$participant) {
             // return response()->json(['message' => 'Participant not found'], 404);
             return back()->with('error', 'Participant not found');
@@ -101,17 +107,23 @@ class ParticipantsController extends Controller
     // Update a participant
     public function update(Request $request, $id)
     {
-        $participant = Participant::findOrFail($id);
+        $participantId = Crypt::decrypt($id);
+        $participant = Participant::findOrFail($participantId);
 
-        $validated = $request->validate([
-            'no_induk' => 'sometimes|required|string|max:50|unique:participants,no_induk,' . $id,
+        $validator =  Validator::make($request->all(), [
             'nama' => 'sometimes|required|string|max:100',
-            'id_kartu' => 'sometimes|required|string|max:50|unique:participants,id_kartu,' . $id,
             'no_hp' => 'nullable|string|max:20',
             'alamat' => 'nullable|string',
         ]);
 
+        if($validator->fails()){
+            return back()->withErrors($validator)->withInput();
+        }
+
+        $validated = $validator->validated();
+
         $participant->update($validated);
+        Alert::success('Berhasil!', 'Participant berhasil diubah 🎉');
 
         // return response()->json($participant);
         // return back()->with('success', 'Participant updated successfully');
@@ -121,12 +133,14 @@ class ParticipantsController extends Controller
     // Delete a participant
     public function destroy($id)
     {
-        $participant = Participant::find($id);
+        $participantId = Crypt::decrypt($id);
+        $participant = Participant::find($participantId);
         if (!$participant) {
             // return response()->json(['message' => 'Participant not found'], 404);
             return back()->with('error', 'Participant not found');
         }
         $participant->delete();
+        Alert::success('Berhasil!', 'Participant berhasil dihapus 🎉');
 
         // return response()->json(['message' => 'Participant deleted']);
         return back()->with('success', 'Participant deleted successfully');
