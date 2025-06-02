@@ -6,7 +6,9 @@ use Illuminate\Http\Request;
 use App\Models\WaktuLibur;
 use App\Models\GroupLibur;
 use App\Models\Group;
+use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Validator;
+use RealRashid\SweetAlert\Facades\Alert;
 
 class WaktuLiburController extends Controller
 {
@@ -25,43 +27,39 @@ class WaktuLiburController extends Controller
             $waktuLiburs = WaktuLibur::paginate(10);
         }
 
-        // return response()->json($waktuLibur);
         return view('Managment.WaktuLibur.waktuLiburs', compact('waktuLiburs'));
     }
 
     public function create()
     {
-        // return response()->json(['message' => 'Create Waktu Libur']);
-        $groups = Group::all(); // Assuming you have a Group model
+        $groups = Group::all();
         return view('Managment.WaktuLibur.create', compact('groups'));
     }
 
     // Store a new waktu libur
     public function store(Request $request)
     {
-        // dd($request->all());
         $validated = Validator::make($request->all(), [
             'nama_libur' => 'required|string|max:255',
             'tanggal_mulai' => 'required|date',
             'tanggal_akhir' => 'required|date|after_or_equal:tanggal_mulai',
         ]);
         if ($validated->fails()) {
-            // return response()->json($validated->errors(), 422);
+            Alert::error('Gagal!', 'Validasi gagal!');
             return back()->withErrors($validated)->withInput();
         }
         $validated = $validated->validated();
-        // Check if the waktu libur already exists
+
         $existingWaktuLibur = WaktuLibur::where('nama_libur', $validated['nama_libur'])
             ->where('tanggal_mulai', $validated['tanggal_mulai'])
             ->where('tanggal_akhir', $validated['tanggal_akhir'])
             ->first();
         if ($existingWaktuLibur) {
-            // return response()->json(['message' => 'WaktuLibur already exists'], 422);
+            Alert::error('Gagal!', 'WaktuLibur sudah ada!');
             return back()->withErrors(['message' => 'WaktuLibur already exists'])->withInput();
         }
 
         $waktuLiburId = WaktuLibur::create($validated)->id;
-        // Attach groups if provided
         if ($request->has('groups')) {
             foreach ($request->groups as $groupId) {
                 GroupLibur::create([
@@ -71,51 +69,50 @@ class WaktuLiburController extends Controller
             }
         }
 
-        // return response()->json($waktuLibur, 201);
+        Alert::success('Berhasil!', 'Waktu Libur berhasil dibuat 🎉');
         return redirect()->route('waktuLibur.index')->with('success', 'Waktu Libur created successfully');
     }
 
     // Show a single waktu libur
     public function show($id)
     {
-        $waktuLibur = WaktuLibur::with('groupLibur')->find($id);
+        $waktuLiburId = Crypt::decrypt($id);
+        $waktuLibur = WaktuLibur::with('groupLibur')->find($waktuLiburId);
         if (!$waktuLibur) {
-            // return response()->json(['message' => 'WaktuLibur not found'], 404);
+            Alert::error('Gagal!', 'WaktuLibur tidak ditemukan!');
             return redirect()->route('waktuLibur.index')->withErrors(['message' => 'WaktuLibur not found']);
         }
 
-        $groupLibur = $waktuLibur->groupLibur;// Assuming you have a relationship defined in WaktuLibur model
+        $groupLibur = $waktuLibur->groupLibur;
         $groups = $groupLibur->map(function ($item) {
-            return $item->group; // Assuming you have a relationship defined in GroupLibur model
+            return $item->group;
         });
-        // return response()->json($groups);
         return view('Managment.WaktuLibur.show', compact('waktuLibur', 'groups'));
     }
 
     public function edit($id)
     {
-        $waktuLibur = WaktuLibur::with('groupLibur')->find($id);
+        $waktuLiburId = Crypt::decrypt($id);
+        $waktuLibur = WaktuLibur::with('groupLibur')->find($waktuLiburId);
         if (!$waktuLibur) {
-            // return response()->json(['message' => 'WaktuLibur not found'], 404);
+            Alert::error('Gagal!', 'WaktuLibur tidak ditemukan!');
             return redirect()->route('waktuLibur.index')->withErrors(['message' => 'WaktuLibur not found']);
         }
 
-        $groupLibur = $waktuLibur->groupLibur;// Assuming you have a relationship defined in WaktuLibur model
-        $groups = Group::all(); // Get all groups to show in the form
+        $groupLibur = $waktuLibur->groupLibur;
+        $groups = Group::all();
+        $selectedGroups = $groupLibur->pluck('id_group')->toArray();
 
-        $selectedGroups = $groupLibur->pluck('id_group')->toArray(); // Get the IDs of the groups associated with this waktu libur
-
-        // return response()->json($selectedGroups);
         return view('Managment.WaktuLibur.edit', compact('waktuLibur', 'groups', 'selectedGroups'));
     }
 
     // Update a waktu libur
     public function update(Request $request, $id)
     {
-        // dd($request->all());
-        $waktuLibur = WaktuLibur::find($id);
+        $waktuLiburId = Crypt::decrypt($id);
+        $waktuLibur = WaktuLibur::with('groupLibur')->find($waktuLiburId);
         if (!$waktuLibur) {
-            // return response()->json(['message' => 'WaktuLibur not found'], 404);
+            Alert::error('Gagal!', 'WaktuLibur tidak ditemukan!');
             return redirect()->route('waktuLibur.index')->withErrors(['message' => 'WaktuLibur not found']);
         }
 
@@ -125,18 +122,18 @@ class WaktuLiburController extends Controller
             'tanggal_akhir' => 'sometimes|required|date|after_or_equal:tanggal_mulai',
         ]);
         if ($validated->fails()) {
-            // return response()->json($validated->errors(), 422);
+            Alert::error('Gagal!', 'Validasi gagal!');
             return back()->withErrors($validated)->withInput();
         }
         $validated = $validated->validated();
-        // Check if the waktu libur already exists with different ID
+
         $existingWaktuLibur = WaktuLibur::where('nama_libur', $validated['nama_libur'])
             ->where('tanggal_mulai', $validated['tanggal_mulai'])
             ->where('tanggal_akhir', $validated['tanggal_akhir'])
-            ->where('id', '!=', $id)
+            ->where('id', '!=', $waktuLiburId)
             ->first();
         if ($existingWaktuLibur) {
-            // return response()->json(['message' => 'WaktuLibur already exists'], 422);
+            Alert::error('Gagal!', 'WaktuLibur sudah ada!');
             return back()->withErrors(['message' => 'WaktuLibur already exists'])->withInput();
         }
 
@@ -145,28 +142,28 @@ class WaktuLiburController extends Controller
         if ($request->has('groups')) {
             foreach ($request->groups as $groupId) {
                 GroupLibur::create([
-                    'id_waktu_libur' => $id,
+                    'id_waktu_libur' => $waktuLiburId,
                     'id_group' => $groupId,
                 ]);
             }
         }
 
-        // return response()->json($waktuLibur);
+        Alert::success('Berhasil!', 'Waktu Libur berhasil diupdate 🎉');
         return redirect()->route('waktuLibur.index')->with('success', 'Waktu Libur updated successfully');
     }
 
     // Delete a waktu libur
-    public function destroy($id, $waktuLiburId)
+    public function destroy($id)
     {
-        dd($id, $waktuLiburId);
-        $waktuLibur = WaktuLibur::find($id);
+        $waktuLiburId = Crypt::decrypt($id);
+        $waktuLibur = WaktuLibur::with('groupLibur')->find($waktuLiburId);
         if (!$waktuLibur) {
-            // return response()->json(['message' => 'WaktuLibur not found'], 404);
+            Alert::error('Gagal!', 'WaktuLibur tidak ditemukan!');
             return redirect()->route('waktuLibur.index')->withErrors(['message' => 'WaktuLibur not found']);
         }
         $waktuLibur->delete();
 
-        // return response()->json(['message' => 'WaktuLibur deleted']);
+        Alert::success('Berhasil!', 'Waktu Libur berhasil dihapus 🎉');
         return redirect()->route('waktuLibur.index')->with('success', 'Waktu Libur deleted successfully');
     }
 }

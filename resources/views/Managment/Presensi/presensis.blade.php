@@ -71,16 +71,16 @@
                         </tr>
                     </thead>
                     <tbody class="border-top-0">
-                        @forelse ($presensis as $presensi)
+                        @forelse ($presensis as $key => $presensi)
                         <tr>
-                            <td class="ps-4 fw-semibold">{{ $presensi->id }}</td>
+                            <td class="ps-4 fw-semibold">{{ $key + 1 }}</td>
                             <td>{{ $presensi->participant->nama ?? "-"}}</td>
                             <td>{{ $presensi->waktu_masuk }}</td>
                             <td>{{ $presensi->waktu_keluar }}</td>
                             <td>{{ $presensi->device->nama }}</td>
                             <td class="text-end pe-4">
                                 <div class="d-flex gap-2 justify-content-end">
-                                    <a href="{{ route('participant.show', $presensi->participant->id) }}" 
+                                    <a href="{{ route('participant.show', Crypt::encrypt($presensi->participant->id)) }}" 
                                     class="btn btn-sm btn-primary d-inline-flex align-items-center gap-1">
                                         <i class="ti ti-search"></i> Detail Participant
                                     </a>

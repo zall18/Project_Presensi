@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\WaktuLibur;
 use Illuminate\Http\Request;
 use App\Models\GroupLibur;
+use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Validator;
 
 class GroupLiburController extends Controller
@@ -89,8 +90,10 @@ class GroupLiburController extends Controller
     // Delete a group libur
     public function destroy($id_group, $id_waktu_libur)
     {
-        $waktuLibur = GroupLibur::where('id_group', $id_group)
-            ->where('id_waktu_libur', $id_waktu_libur)
+        $groupId = Crypt::decrypt($id_group);
+        $waktuLiburId = Crypt::decrypt($id_waktu_libur);
+        $waktuLibur = GroupLibur::where('id_group', $groupId)
+            ->where('id_waktu_libur', $waktuLiburId)
             ->first();
         if (!$waktuLibur) {
             // return response()->json(['message' => 'GroupLibur not found'], 404);

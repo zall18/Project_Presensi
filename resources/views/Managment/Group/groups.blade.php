@@ -34,11 +34,11 @@
                 </div>
                 <div class="col-md-6 text-md-end">
                     <div class="text-muted small">
-                        {{-- @if($groups->total() > 0)
+                        @if($groups->total() > 0)
                         Showing {{ $groups->firstItem() }}-{{ $groups->lastItem() }} of {{ $groups->total() }}
-                        @else --}}
+                        @else
                         No records found
-                        {{-- @endif --}}
+                        @endif
                     </div>
                 </div>
             </div>
@@ -90,19 +90,18 @@
                                 <div class="d-flex align-items-center gap-3">
                                     <div class="d-flex flex-column">
                                         <span class="fw-medium">{{ $group->nama }}</span>
-                                        <small class="text-muted">ID: {{ $group->id }}</small>
                                     </div>
                                 </div>
                             </td>
                             <td class="text-end pe-4">
                                 <div class="d-flex gap-2 justify-content-end">
-                                    <a href="{{ route('group.show', $group->id) }}" class="btn btn-sm btn-icon btn-outline-info rounded-3" data-bs-toggle="tooltip" title="View">
+                                    <a href="{{ route('group.show', Crypt::encrypt($group->id)) }}" class="btn btn-sm btn-icon btn-outline-info rounded-3" data-bs-toggle="tooltip" title="View">
                                         <i class="ti ti-eye"></i>
                                     </a>
-                                    <a href="{{ route('group.edit', $group->id) }}" class="btn btn-sm btn-icon btn-outline-primary rounded-3" data-bs-toggle="tooltip" title="Edit">
+                                    <a href="{{ route('group.edit', Crypt::encrypt($group->id)) }}" class="btn btn-sm btn-icon btn-outline-primary rounded-3" data-bs-toggle="tooltip" title="Edit">
                                         <i class="ti ti-pencil"></i>
                                     </a>
-                                    <form action="{{ route('group.destroy', $group->id) }}" method="POST" class="d-inline">
+                                    <form action="{{ route('group.destroy', Crypt::encrypt($group->id)) }}" method="POST" class="d-inline">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" class="btn btn-sm btn-icon btn-outline-danger rounded-3"
@@ -133,10 +132,22 @@
                 </table>
             </div>
         </div>
-        {{-- Pagination --}}
-        {{-- <div class="d-flex justify-content-end mt-3">
-            {{ $groups->links() }}
-        </div> --}}
+        @if($groups->hasPages())
+        <div class="card-footer bg-transparent border-0 py-3">
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-center">
+                <div class="mb-2 mb-md-0">
+                    <p class="small text-muted mb-0">
+                        Showing {{ $groups->firstItem() }} to {{ $groups->lastItem() }} of {{ $groups->total() }} entries
+                    </p>
+                </div>
+                <nav aria-label="Page navigation">
+                    <ul class="pagination pagination-sm mb-0">
+                        {{ $groups->appends(request()->query())->onEachSide(1)->links() }}
+                    </ul>
+                </nav>
+            </div>
+        </div>
+        @endif
     </div>
 </div>
 @endsection

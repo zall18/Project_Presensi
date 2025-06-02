@@ -34,11 +34,11 @@
                 </div>
                 <div class="col-md-6 text-md-end">
                     <div class="text-muted small">
-                        {{-- @if($waktuLiburs->total() > 0)
+                        @if($waktuLiburs->total() > 0)
                         Showing {{ $waktuLiburs->firstItem() }}-{{ $waktuLiburs->lastItem() }} of {{ $waktuLiburs->total() }}
-                        @else --}}
+                        @else
                         No records found
-                        {{-- @endif --}}
+                        @endif
                     </div>
                 </div>
             </div>
@@ -66,7 +66,7 @@
                             </th>
                             <th>
                                 <a href="{{ route('waktuLibur.index', [
-                                    'sort' => 'nama',
+                                    'sort' => 'nama_libur',
                                     'direction' => request('sort') == 'nama' && request('direction') == 'asc' ? 'desc' : 'asc',
                                     'search' => request('search'),
                                 ]) }}" class="text-decoration-none text-dark d-flex align-items-center gap-1">
@@ -107,13 +107,13 @@
                             <td>{{ $waktuLibur->tanggal_akhir }}</td>
                             <td class="text-end pe-4">
                                 <div class="d-flex gap-2 justify-content-end">
-                                    <a href="{{ route('waktuLibur.show', $waktuLibur->id) }}" class="btn btn-sm btn-icon btn-outline-info rounded-3" data-bs-toggle="tooltip" title="View">
+                                    <a href="{{ route('waktuLibur.show', Crypt::encrypt($waktuLibur->id)) }}" class="btn btn-sm btn-icon btn-outline-info rounded-3" data-bs-toggle="tooltip" title="View">
                                         <i class="ti ti-eye"></i>
                                     </a>
-                                    <a href="{{ route('waktuLibur.edit', $waktuLibur->id) }}" class="btn btn-sm btn-icon btn-outline-primary rounded-3" data-bs-toggle="tooltip" title="Edit">
+                                    <a href="{{ route('waktuLibur.edit', Crypt::encrypt($waktuLibur->id)) }}" class="btn btn-sm btn-icon btn-outline-primary rounded-3" data-bs-toggle="tooltip" title="Edit">
                                         <i class="ti ti-pencil"></i>
                                     </a>
-                                    <form action="{{ route('waktuLibur.destroy', $waktuLibur->id) }}" method="POST" class="d-inline">
+                                    <form action="{{ route('waktuLibur.destroy', Crypt::encrypt($waktuLibur->id)) }}" method="POST" class="d-inline">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" class="btn btn-sm btn-icon btn-outline-danger rounded-3"

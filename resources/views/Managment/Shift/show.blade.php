@@ -22,7 +22,7 @@
             <h3 class="fw-semibold mb-1">Detail Sehift</h3>
             <p class="text-muted mb-0">Manage all detail shift in the system</p>
         </div>
-        <a href="{{ route('shift.createDetailShift', $shift->id) }}" class="btn btn-success d-flex align-items-center">
+        <a href="{{ route('shift.createDetailShift', Crypt::encrypt($shift->id)) }}" class="btn btn-success d-flex align-items-center">
             <i class="ti ti-plus me-1"></i> Add detail shift
         </a>
     </div>

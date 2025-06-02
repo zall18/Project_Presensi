@@ -93,7 +93,6 @@
                                 <div class="d-flex align-items-center gap-3">
                                     <div class="d-flex flex-column">
                                         <span class="fw-medium">{{ $shift->nama }}</span>
-                                        <small class="text-muted">ID: {{ $shift->id }}</small>
                                     </div>
                                 </div>
                             </td>
@@ -102,13 +101,13 @@
                             <td>{{ $shift->jamKerja->jam_pulang }}</td>
                             <td class="text-end pe-4">
                                 <div class="d-flex gap-2 justify-content-end">
-                                    <a href="{{ route('shift.show', $shift->id) }}" class="btn btn-sm btn-icon btn-outline-info rounded-3" data-bs-toggle="tooltip" title="View">
+                                    <a href="{{ route('shift.show', Crypt::encrypt($shift->id)) }}" class="btn btn-sm btn-icon btn-outline-info rounded-3" data-bs-toggle="tooltip" title="View">
                                         <i class="ti ti-eye"></i>
                                     </a>
-                                    <a href="{{ route('shift.edit', $shift->id) }}" class="btn btn-sm btn-icon btn-outline-primary rounded-3" data-bs-toggle="tooltip" title="Edit">
+                                    <a href="{{ route('shift.edit', Crypt::encrypt($shift->id)) }}" class="btn btn-sm btn-icon btn-outline-primary rounded-3" data-bs-toggle="tooltip" title="Edit">
                                         <i class="ti ti-pencil"></i>
                                     </a>
-                                    <form action="{{ route('shift.destroy', $shift->id) }}" method="POST" class="d-inline">
+                                    <form action="{{ route('shift.destroy', Crypt::encrypt($shift->id)) }}" method="POST" class="d-inline">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" class="btn btn-sm btn-icon btn-outline-danger rounded-3"

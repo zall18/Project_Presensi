@@ -14,7 +14,7 @@
 
     <div class="card shadow-sm border-0">
         <div class="card-body">
-            <form action="{{ route('device.update', $device->id) }}" method="POST">
+            <form action="{{ route('device.update', Crypt::encrypt($device->id)) }}" method="POST">
                 @csrf
                 @method('PUT')
 

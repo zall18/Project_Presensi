@@ -23,9 +23,9 @@
                         </tr>
                     </thead>
                     <tbody class="border-top-0">
-                        @forelse ($shifts as $shift)
+                        @forelse ($shifts as $key => $shift)
                         <tr>
-                            <td class="ps-4 fw-semibold">{{ $shift->id }}</td>
+                            <td class="ps-4 fw-semibold">{{ $key + 1 }}</td>
                             <td>{{ $shift->nama }}</td>
                             <td>{{ $shift->jamKerja->jam_masuk }}</td>
                             <td>{{ $shift->jamKerja->jam_pulang }}</td>
@@ -36,15 +36,15 @@
                                 </a>
                             </td> --}}
                             <td class="text-end pe-4">
-                                <a href="{{ route('jadwalParticipant.create', $shift->id) }}" 
+                                <a href="{{ route('jadwalParticipant.create', Crypt::encrypt($shift->id)) }}" 
                                    class="btn btn-sm btn-primary d-inline-flex align-items-center gap-1">
                                     <i class="ti ti-user-plus"></i> Pilih Participant
                                 </a>
-                                <a href="{{ route('jadwalParticipant.remove', $shift->id) }}" 
+                                <a href="{{ route('jadwalParticipant.remove', Crypt::encrypt($shift->id)) }}" 
                                    class="btn btn-sm btn-danger d-inline-flex align-items-center gap-1">
                                     <i class="ti ti-user-minus"></i> Remove Participant
                                 </a>
-                                <a href="{{ route('jadwalParticipant.show', $shift->id) }}" 
+                                <a href="{{ route('jadwalParticipant.show', Crypt::encrypt($shift->id)) }}" 
                                    class="btn btn-sm btn-primary d-inline-flex align-items-center gap-1">
                                     <i class="ti ti-search"></i> Detail Participant
                                 </a>

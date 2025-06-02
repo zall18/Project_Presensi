@@ -34,11 +34,11 @@
                 </div>
                 <div class="col-md-6 text-md-end">
                     <div class="text-muted small">
-                        {{-- @if($devices->total() > 0)
+                        @if($devices->total() > 0)
                         Showing {{ $devices->firstItem() }}-{{ $devices->lastItem() }} of {{ $devices->total() }}
-                        @else --}}
+                        @else
                         No records found
-                        {{-- @endif --}}
+                        @endif
                     </div>
                 </div>
             </div>
@@ -85,21 +85,21 @@
                         </tr>
                     </thead>
                     <tbody class="border-top-0">
-                        @forelse ($devices as $device)
+                        @forelse ($devices as $key => $device)
                         <tr>
-                            <td class="ps-4 fw-semibold">{{ $device->id }}</td>
+                            <td class="ps-4 fw-semibold">{{ $key + 1 }}</td>
                             <td>{{ $device->nama }}</td>
                             <td>{{ $device->device_id }}</td>
                             <td>{{ $device->lokasi }}</td>
                             <td class="text-end pe-4">
                                 <div class="d-flex gap-2 justify-content-end">
-                                    <a href="{{ route('device.show', $device->id) }}" class="btn btn-sm btn-icon btn-outline-info rounded-3" data-bs-toggle="tooltip" title="View">
+                                    <a href="{{ route('device.show', Crypt::encrypt($device->id)) }}" class="btn btn-sm btn-icon btn-outline-info rounded-3" data-bs-toggle="tooltip" title="View">
                                         <i class="ti ti-eye"></i>
                                     </a>
-                                    <a href="{{ route('device.edit', $device->id) }}" class="btn btn-sm btn-icon btn-outline-primary rounded-3" data-bs-toggle="tooltip" title="Edit">
+                                    <a href="{{ route('device.edit', Crypt::encrypt($device->id)) }}" class="btn btn-sm btn-icon btn-outline-primary rounded-3" data-bs-toggle="tooltip" title="Edit">
                                         <i class="ti ti-pencil"></i>
                                     </a>
-                                    <form action="{{ route('device.destroy', $device->id) }}" method="POST" class="d-inline">
+                                    <form action="{{ route('device.destroy', Crypt::encrypt($device->id)) }}" method="POST" class="d-inline">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" class="btn btn-sm btn-icon btn-outline-danger rounded-3"

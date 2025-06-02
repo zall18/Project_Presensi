@@ -23,10 +23,10 @@
             <p class="text-muted mb-0">Manage all group participant in the system</p>
         </div>
         <div>
-            <a href="{{ route('group.addParticipant', $group->id) }}" class="btn btn-success d-flex align-items-center">
+            <a href="{{ route('group.addParticipant', Crypt::encrypt($group->id)) }}" class="btn btn-success d-flex align-items-center">
                 <i class="ti ti-plus me-1"></i> Add/Update Group Participant
             </a>
-            <a href="{{ route('group.addParticipant', $group->id) }}" class="btn btn-danger d-flex align-items-center mt-2">
+            <a href="{{ route('group.addParticipant', Crypt::encrypt($group->id)) }}" class="btn btn-danger d-flex align-items-center mt-2">
                 <i class="ti ti-minus me-1"></i> Remove Group Participant
             </a>
         </div>
@@ -36,7 +36,7 @@
         <div class="card-header bg-transparent border-0 pt-3 pb-2">
             <div class="row g-3">
                 <div class="col-md-6">
-                    <form action="{{ route('group.show', $group->id) }}" method="GET">
+                    <form action="{{ route('group.show', Crypt::encrypt($group->id)) }}" method="GET">
                         <div class="input-group input-group-merge">
                             <span class="input-group-text bg-transparent">
                                 <i class="ti ti-search"></i>

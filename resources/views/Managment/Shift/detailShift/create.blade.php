@@ -3,11 +3,20 @@
 @section('container')
 <div class="container mt-4">
     <h3 class="mb-4">Create Detail Shift</h3>
+        @if ($errors->any())
+        <div class="alert alert-danger">
+            <ul class="mb-0">
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
     <form action="{{ route('detail-shifts.store') }}" method="POST">
         @csrf
         <div class="mb-3">
             <label for="hari" class="form-label">Hari</label>
-             <input type="hidden" name="shift_id" value="{{ $shift->id }}">
+             <input type="hidden" name="shift_id" value="{{ Crypt::encrypt($shift->id) }}">
             <select class="form-select" id="hari" name="hari" required>
                 <option value="" disabled selected>Pilih Hari</option>
                 @foreach(['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu'] as $day)
@@ -23,7 +32,7 @@
             @enderror
         </div>
         <button type="submit" class="btn btn-primary">Create</button>
-        <a href="{{ route('shift.show', $shift->id) }}" class="btn btn-secondary">Cancel</a>
+        <a href="{{ route('shift.show', Crypt::encrypt($shift->id)) }}" class="btn btn-secondary">Cancel</a>
     </form>
 </div>
 @endsection

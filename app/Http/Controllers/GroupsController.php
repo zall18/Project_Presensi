@@ -5,14 +5,23 @@ namespace App\Http\Controllers;
 use App\Models\Group;
 use App\Models\Participant;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Validator;
+use RealRashid\SweetAlert\Facades\Alert;
 
 class GroupsController extends Controller
 {
     // List all groups
-    public function index()
+    public function index(Request $request)
     {
-        $groups = Group::all();
+        $groups = Group::paginate(10);
+        if ($request->has('search')){
+            $groups = Group::where('nama', 'LIKE', '%'. $request->search .'%')->paginate(10);
+        } elseif ($request->sort && $request->direction) {
+            $groups = Group::orderBy($request->sort, $request->direction)->paginate(10);
+        } else {
+            $groups = Group::paginate(10);
+        }
         // return response()->json($groups);
         return view('Managment.Group.groups', compact('groups'));
     }
@@ -28,41 +37,39 @@ class GroupsController extends Controller
             'nama' => 'required|string|max:255|unique:groups',
         ]);
         if ($validated->fails()) {
-            return response()->json($validated->errors(), 422);
+            Alert::error('Gagal!', 'Validasi gagal!');
+            return redirect()->back()->withErrors($validated)->withInput();
         }
         $validated = $validated->validated();
 
         $group = Group::create($validated);
 
-        // return response()->json($group, 201);
+        Alert::success('Berhasil!', 'Group berhasil dibuat 🎉');
         return redirect()->route('group.index')->with('success', 'Group created successfully');
     }
 
     public function addParticipant($id)
     {
-        $group = Group::find($id);
+        $groupId = Crypt::decrypt($id);
+        $group = Group::find($groupId);
         if (!$group) {
-            return response()->json(['message' => 'Group not found'], 404);
+            Alert::error('Gagal!', 'Group tidak ditemukan!');
+            return redirect()->route('group.index');
         }
         $participants = Participant::all();
-        $groupParticipantIds = Group::find($id)->participants()->pluck('participants.id')->toArray();
-        // return response()->json([
-        //     'group' => $group,
-        //     'participants' => $participants,
-        //     'groupParticipants' => $groupParticipants,
-        // ]);
+        $groupParticipantIds = Group::find($groupId)->participants()->pluck('participants.id')->toArray();
 
-        // return response()->json($participants);
         return view('Managment.Group.groupParticipant.create', compact('group', 'participants', 'groupParticipantIds'));
     }
-
 
     // Show a single group
     public function show(Request $request, $id)
     {
-        $group = Group::with('participants')->find($id);
+        $groupId = Crypt::decrypt($id);
+        $group = Group::with('participants')->find($groupId);
         if (!$group) {
-            return response()->json(['message' => 'Group not found'], 404);
+            Alert::error('Gagal!', 'Group tidak ditemukan!');
+            return redirect()->route('group.index');
         }
         $participantsQuery = $group->participants();
 
@@ -80,56 +87,61 @@ class GroupsController extends Controller
 
         $participants = $participantsQuery->paginate(10);
 
-
         return view('Managment.Group.show', compact('group', 'participants'));
     }
 
     public function edit($id)
     {
-        $group = Group::find($id);
+        $groupId = Crypt::decrypt($id);
+        $group = Group::find($groupId);
         if (!$group) {
-            return response()->json(['message' => 'Group not found'], 404);
+            Alert::error('Gagal!', 'Group tidak ditemukan!');
+            return redirect()->route('group.index');
         }
-        // return response()->json($group);
         return view('Managment.Group.edit', compact('group'));
     }
 
     // Update a group
     public function update(Request $request, $id)
     {
-        $group = Group::find($id);
+        $groupId = Crypt::decrypt($id);
+        $group = Group::find($groupId);
         if (!$group) {
-            return response()->json(['message' => 'Group not found'], 404);
+            Alert::error('Gagal!', 'Group tidak ditemukan!');
+            return redirect()->route('group.index');
         }
 
         $validated = Validator::make($request->all(), [
             'nama' => 'sometimes|required|string|max:255|unique:groups,nama,' . $group->id,
         ]);
         if ($validated->fails()) {
-            return response()->json($validated->errors(), 422);
+            Alert::error('Gagal!', 'Validasi gagal!');
+            return redirect()->back()->withErrors($validated)->withInput();
         }
         $validated = $validated->validated();
         $group->update($validated);
 
-        // return response()->json($group);
+        Alert::success('Berhasil!', 'Group berhasil diupdate 🎉');
         return redirect()->route('group.index')->with('success', 'Group updated successfully');
-
     }
 
     // Delete a group
     public function destroy($id)
     {
-        $group = Group::find($id);
+        $groupId = Crypt::decrypt($id);
+        $group = Group::find($groupId);
         if (!$group) {
-            return response()->json(['message' => 'Group not found'], 404);
+            Alert::error('Gagal!', 'Group tidak ditemukan!');
+            return redirect()->route('group.index');
         }
         // Check if the group has participants
         if ($group->participants()->count() > 0) {
-            return response()->json(['message' => 'Group cannot be deleted because it has participants'], 422);
+            Alert::error('Gagal!', 'Group memiliki peserta!');
+            return redirect()->route('group.index');
         }
         $group->delete();
 
-        // return response()->json(['message' => 'Group deleted']);
+        Alert::success('Berhasil!', 'Group berhasil dihapus 🎉');
         return redirect()->route('group.index')->with('success', 'Group deleted successfully');
     }
 }

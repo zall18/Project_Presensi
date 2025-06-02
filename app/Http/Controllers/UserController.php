@@ -126,6 +126,7 @@ class UserController extends Controller
 
         if ($validator->fails()) {
             // return response()->json($validator->errors(), 422);
+            return back()->withErrors($validator)->withInput();
             
         }
 
@@ -139,7 +140,7 @@ class UserController extends Controller
 
 
         // return response()->json($user);
-        return redirect()->route('user.index')->with('success', 'User created successfully');return view(route('user.index'));
+        return redirect()->route('user.index')->with('success', 'User created successfully');
     }
 
     // Remove the specified user

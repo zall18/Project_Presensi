@@ -24,7 +24,7 @@
 
     <div class="card shadow-sm border-0">
         <div class="card-body">
-            <form action="{{ route('jamKerja.update', $jamkerja->id) }}" method="POST">
+            <form action="{{ route('jamKerja.update', Crypt::encrypt($jamkerja->id)) }}" method="POST">
                 @csrf
                 @method('PUT')
 
@@ -54,7 +54,7 @@
                                    id="jam_masuk"
                                    name="jam_masuk"
                                    placeholder="Jam Masuk"
-                                   value="{{ old('jam_masuk', $jamkerja->jam_masuk) }}"
+                                   value="{{ old('jam_masuk', substr($jamkerja->jam_masuk, 0, 5)) }}"
                                    required>
                             <label for="jam_masuk">Jam Masuk</label>
                             @error('jam_masuk')
@@ -71,7 +71,7 @@
                                    id="jam_pulang"
                                    name="jam_pulang"
                                    placeholder="Jam Pulang"
-                                   value="{{ old('jam_pulang', $jamkerja->jam_pulang) }}"
+                                   value="{{ old('jam_pulang', substr($jamkerja->jam_pulang, 0, 5)) }}"
                                    required>
                             <label for="jam_pulang">Jam Pulang</label>
                             @error('jam_pulang')
@@ -124,7 +124,7 @@
                                    id="jam_mulai_scan_masuk"
                                    name="jam_mulai_scan_masuk"
                                    placeholder="Jam Mulai Scan Masuk"
-                                   value="{{ old('jam_mulai_scan_masuk', $jamkerja->jam_mulai_scan_masuk) }}"
+                                   value="{{ old('jam_mulai_scan_masuk', substr($jamkerja->jam_mulai_scan_masuk, 0, 5)) }}"
                                    required>
                             <label for="jam_mulai_scan_masuk">Jam Mulai Scan Masuk</label>
                             @error('jam_mulai_scan_masuk')
@@ -136,13 +136,13 @@
                     <!-- Jam Mulai Scan Keluar -->
                     <div class="col-md-3">
                         <div class="form-floating">
-                            <input type="time"
-                                   class="form-control @error('jam_mulai_scan_keluar') is-invalid @enderror"
-                                   id="jam_mulai_scan_keluar"
-                                   name="jam_mulai_scan_keluar"
-                                   placeholder="Jam Mulai Scan Keluar"
-                                   value="{{ old('jam_mulai_scan_keluar', $jamkerja->jam_mulai_scan_keluar) }}"
-                                   required>
+                        <input type="time"
+                            class="form-control @error('jam_mulai_scan_keluar') is-invalid @enderror"
+                            id="jam_mulai_scan_keluar"
+                            name="jam_mulai_scan_keluar"
+                            placeholder="Jam Mulai Scan Keluar"
+                            value="{{ old('jam_mulai_scan_keluar', substr($jamkerja->jam_mulai_scan_keluar, 0, 5)) }}"
+                            required>
                             <label for="jam_mulai_scan_keluar">Jam Mulai Scan Keluar</label>
                             @error('jam_mulai_scan_keluar')
                                 <div class="invalid-feedback">{{ $message }}</div>

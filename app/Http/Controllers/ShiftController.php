@@ -5,18 +5,17 @@ namespace App\Http\Controllers;
 use App\Models\Shift;
 use App\Models\JamKerja;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Validator;
+use RealRashid\SweetAlert\Facades\Alert;
 
 class ShiftController extends Controller
 {
     // List all shifts
     public function index(Request $request)
     {
-        // $shifts = Shift::all();
-        // Pagination
         $shifts = Shift::with('jamKerja', 'detailShifts')->paginate(10);
 
-        // Search functionality
         if ($request->search) {
             $shifts = Shift::where('nama', 'like', '%' . $request->search . '%')
                 ->orWhere('tanggal_mulai', 'like', '%' . $request->search . '%')
@@ -28,27 +27,22 @@ class ShiftController extends Controller
             $shifts = Shift::orderBy($request->sort, $request->direction)->paginate(10);
         }
 
-        // return response()->json($shifts);
-    
-        // $shifts = Shift::with('jamKerja', 'detailShifts')->get();
-        // return response()->json($shifts);
-
         return view('Managment.Shift.shifts', compact('shifts'));
     }
 
     public function create()
     {
-        // Assuming you want to return a view for creating a new shift
-        $jamKerjas = JamKerja::all(); // Fetch all jam kerja for the dropdown
+        $jamKerjas = JamKerja::all();
         return view('Managment.Shift.create', compact('jamKerjas'));
     }
 
     public function createDetailShift($shift_id)
     {
-        // Assuming you want to return a view for creating a new detail shift
-        $shift = Shift::with('detailShifts')->find($shift_id);
+        $shiftId = Crypt::decrypt($shift_id);
+        $shift = Shift::with('jamKerja', 'detailShifts')->find($shiftId);
         if (!$shift) {
-            return response()->json(['message' => 'Shift not found'], 404);
+            Alert::error('Gagal!', 'Shift tidak ditemukan!');
+            return redirect()->route('shift.index');
         }
         return view('Managment.Shift.detailShift.create', compact('shift'));
     }
@@ -62,55 +56,58 @@ class ShiftController extends Controller
             'id_jam_kerja' => 'required|exists:jam_kerjas,id',
         ]);
         if ($validated->fails()) {
-            // return response()->json($validated->errors(), 422);
+            Alert::error('Gagal!', 'Validasi gagal!');
             return back()->withErrors($validated)->withInput();
         }
         $validated = $validated->validated();
-        // Check if the shift already exists
+
         $existingShift = Shift::where('nama', $validated['nama'])
             ->where('tanggal_mulai', $validated['tanggal_mulai'])
             ->where('id_jam_kerja', $validated['id_jam_kerja'])
             ->first();
         if ($existingShift) {
-            return response()->json(['message' => 'Shift already exists'], 422);
+            Alert::error('Gagal!', 'Shift sudah ada!');
+            return back()->withErrors(['message' => 'Shift already exists'])->withInput();
         }
 
         $shift = Shift::create($validated);
 
-        // return response()->json($shift->load('jamKerja'), 201);
+        Alert::success('Berhasil!', 'Shift berhasil dibuat 🎉');
         return redirect()->route('shift.index')->with('success', 'Shift created successfully');
     }
 
     // Show a single shift
     public function show($id)
     {
-        $shift = Shift::with('jamKerja', 'detailShifts')->find($id);
-        // dd($shift);
+        $shiftId = Crypt::decrypt($id);
+        $shift = Shift::with('jamKerja', 'detailShifts')->find($shiftId);
         if (!$shift) {
-            return response()->json(['message' => 'Shift not found'], 404);
+            Alert::error('Gagal!', 'Shift tidak ditemukan!');
+            return redirect()->route('shift.index');
         }
-
-        // return response()->json($shift);
         return view('Managment.Shift.show', compact('shift'));
     }
 
     public function edit($id)
     {
-        $shift = Shift::find($id);
+        $shiftId = Crypt::decrypt($id);
+        $shift = Shift::with('jamKerja', 'detailShifts')->find($shiftId);
         if (!$shift) {
-            return response()->json(['message' => 'Shift not found'], 404);
+            Alert::error('Gagal!', 'Shift tidak ditemukan!');
+            return redirect()->route('shift.index');
         }
         $jamKerjas = JamKerja::all();
-        // Assuming you want to return a view for editing the shift
         return view('Managment.Shift.edit', compact('shift', 'jamKerjas'));
     }
 
     // Update a shift
     public function update(Request $request, $id)
     {
-        $shift = Shift::find($id);
+        $shiftId = Crypt::decrypt($id);
+        $shift = Shift::with('jamKerja', 'detailShifts')->find($shiftId);
         if (!$shift) {
-            return response()->json(['message' => 'Shift not found'], 404);
+            Alert::error('Gagal!', 'Shift tidak ditemukan!');
+            return redirect()->route('shift.index');
         }
         $validated = Validator::make($request->all(), [
             'nama' => 'sometimes|required|string|max:100',
@@ -118,41 +115,45 @@ class ShiftController extends Controller
             'id_jam_kerja' => 'sometimes|required|exists:jam_kerjas,id',
         ]);
         if ($validated->fails()) {
-            return response()->json($validated->errors(), 422);
+            Alert::error('Gagal!', 'Validasi gagal!');
+            return back()->withErrors($validated)->withInput();
         }
         $validated = $validated->validated();
-        // Check if the shift already exists
+
         $existingShift = Shift::where('nama', $validated['nama'])
             ->where('tanggal_mulai', $validated['tanggal_mulai'])
             ->where('id_jam_kerja', $validated['id_jam_kerja'])
-            ->where('id', '!=', $id)
+            ->where('id', '!=', $shift->id)
             ->first();
         if ($existingShift) {
-            return response()->json(['message' => 'Shift already exists'], 422);
+            Alert::error('Gagal!', 'Shift sudah ada!');
+            return back()->withErrors(['message' => 'Shift already exists'])->withInput();
         }
 
         $shift->update($validated);
 
-        // return response()->json($shift->load('jamKerja'));
+        Alert::success('Berhasil!', 'Shift berhasil diupdate 🎉');
         return redirect()->route('shift.index')->with('success', 'Shift updated successfully');
     }
 
     // Delete a shift
     public function destroy($id)
     {
-        $shift = Shift::find($id);
+        $shiftId = Crypt::decrypt($id);
+        $shift = Shift::with('jamKerja', 'detailShifts')->find($shiftId);
         if (!$shift) {
-            return response()->json(['message' => 'Shift not found'], 404);
+            Alert::error('Gagal!', 'Shift tidak ditemukan!');
+            return redirect()->route('shift.index');
         }
 
-        // Check if the shift has jadwal_participants
         if ($shift->jadwal_participant()->exists()) {
-            return response()->json(['message' => 'Shift cannot be deleted because it has jadwal participants'], 422);
+            Alert::error('Gagal!', 'Shift tidak bisa dihapus karena memiliki jadwal peserta!');
+            return back()->withErrors(['message' => 'Shift cannot be deleted because it has jadwal participants'])->withInput();
         }
 
         $shift->delete();
 
-        // return response()->json(['message' => 'Shift deleted']);
+        Alert::success('Berhasil!', 'Shift berhasil dihapus 🎉');
         return redirect()->route('shift.index')->with('success', 'Shift deleted successfully');
     }
 }

@@ -7,7 +7,9 @@ use App\Models\Participant;
 use Illuminate\Http\Request;
 use App\Models\JadwalParticipant;
 use App\Models\Shift;
+use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Validator;
+use RealRashid\SweetAlert\Facades\Alert;
 
 class JadwalParticipantController extends Controller
 {
@@ -16,32 +18,29 @@ class JadwalParticipantController extends Controller
     {
         $jadwalParticipants = JadwalParticipant::with(['shift', 'participant'])->get();
         $shifts = Shift::all();
-        // return response()->json($jadwalParticipants);
         return view('Managment.JadwalParticipant.jadwalParticipants', compact('jadwalParticipants', 'shifts'));
     }
 
-    // Store a new jadwal participant
-
     public function remove(Request $request)
     {
-        $shift = Shift::find($request->id_shift);
+        $shiftId = Crypt::decrypt($request->id_shift);
+        $shift = Shift::find($shiftId);
         if (!$shift) {
-            // return response()->json(['message' => 'Shift not found'], 404);
+            Alert::error('Gagal!', 'Shift tidak ditemukan!');
             return redirect()->route('jadwalParticipant.index')->withErrors(['message' => 'Shift not found']);
         }
         $participants =  Participant::whereHas('jadwalParticipant', function ($query) use ($shift) {
             $query->where('id_shift', $shift->id);
         })->get();
-        // return response()->json($participants);
         return view('Managment.JadwalParticipant.remove', compact('shift', 'participants'));
     }
 
-
     public function create(Request $request)
     {
-        $shift = Shift::find($request->id_shift);
+        $shiftId = Crypt::decrypt($request->id_shift);
+        $shift = Shift::find($shiftId);
         if (!$shift) {
-            // return response()->json(['message' => 'Shift not found'], 404);
+            Alert::error('Gagal!', 'Shift tidak ditemukan!');
             return redirect()->route('jadwalParticipant.index')->withErrors(['message' => 'Shift not found']);
         }
         $grups = Group::all();
@@ -64,37 +63,25 @@ class JadwalParticipantController extends Controller
         $jadwalParticipantIds = JadwalParticipant::where('id_shift', $shift->id)
             ->pluck('id_participant')
             ->toArray();
-        
-        // return response()->json([
-        //     'shift' => $shift,
-        //     'participants' => $participants,
-        //     'grups' => $grups,
-        //     'participantIds' => $jadwalParticipantIds,
-        //     'doentHaveJadwalParticipant' => $doentHaveJadwalParticipant,
-        // ]);
 
         return view('Managment.JadwalParticipant.create', compact('shift', 'grups', 'participants', 'jadwalParticipantIds'));
     }
 
     public function store(Request $request)
     {
-        // dd($request->all());
         $validated = Validator::make($request->all(), [
             'id_shift' => 'required|exists:shifts,id',
-            // 'id_participant' => 'required|exists:participants,id',
         ]);
         if ($validated->fails()) {
-            // return response()->json($validated->errors(), 422);
+            Alert::error('Gagal!', 'Validasi gagal!');
             return back()->withErrors($validated)->withInput();
         }
         $validated = $validated->validated();
 
         foreach ($request->participants as $participantId) {
-            // Check if the jadwal participant already exists
             $existingJadwalParticipant = JadwalParticipant::where('id_participant', $participantId)
                 ->first();
             if ($existingJadwalParticipant) {
-                // return response()->json(['message' => 'JadwalParticipant already exists'], 422);
                 JadwalParticipant::where('id_participant', $participantId)
                     ->update(['id_shift' => $validated['id_shift']]);
                 continue;
@@ -106,42 +93,30 @@ class JadwalParticipantController extends Controller
             ]);
         }
 
-        // Check if the jadwal participant already exists
-        // $existingJadwalParticipant = JadwalParticipant::where('id_shift', $validated['id_shift'])
-        //     ->where('id_participant', $validated['id_participant'])
-        //     ->first();
-        // if ($existingJadwalParticipant) {
-        //     // return response()->json(['message' => 'JadwalParticipant already exists'], 422);
-        //     return back()->withErrors(['message' => 'JadwalParticipant already exists'])->withInput();
-        // }
-
-        // $jadwalParticipant = JadwalParticipant::create($validated);
-
-        // return response()->json($jadwalParticipant->load(['shift', 'participant']), 201);
+        Alert::success('Berhasil!', 'JadwalParticipant berhasil dibuat 🎉');
         return redirect()->route('jadwalParticipant.index')->with('success', 'JadwalParticipant created successfully');
     }
 
     // Show a single jadwal participant
     public function show(Request $request)
     {
-        // dd($request->all());
+        $shiftId = Crypt::decrypt($request->id_shift);
+        $shift = Shift::find($shiftId);
         $jadwalParticipant = JadwalParticipant::with(['shift', 'participant'])
-            ->where('id_shift', $request->id_shift)
+            ->where('id_shift', $shiftId)
             ->get();
         if ($jadwalParticipant->isEmpty()) {
-            // return response()->json(['message' => 'JadwalParticipant not found'], 404);
+            Alert::error('Gagal!', 'JadwalParticipant tidak ditemukan!');
             return redirect()->route('jadwalParticipant.index')->withErrors(['message' => 'JadwalParticipant not found']);
         }
     
-        $shift = Shift::find($request->id_shift);
         if (!$shift) {
-            // return response()->json(['message' => 'Shift not found'], 404);
+            Alert::error('Gagal!', 'Shift tidak ditemukan!');
             return redirect()->route('jadwalParticipant.index')->withErrors(['message' => 'Shift not found']);
         }
         $participants =  Participant::whereHas('jadwalParticipant', function ($query) use ($shift) {
             $query->where('id_shift', $shift->id);
         })->get();
-        // return response()->json($jadwalParticipant);
         return view('Managment.JadwalParticipant.show', compact('shift', 'participants', 'jadwalParticipant'));
     }
 
@@ -154,31 +129,29 @@ class JadwalParticipantController extends Controller
             'id_shift' => 'sometimes|required|exists:shifts,id',
         ]);
         if (isset($validated['id_shift'])) {
-            // Check if the jadwal participant already exists
             $existingJadwalParticipant = JadwalParticipant::where('id_shift', $validated['id_shift'])
                 ->where('id_participant', $jadwalParticipant->id_participant)
                 ->first();
             if ($existingJadwalParticipant) {
-                // return response()->json(['message' => 'JadwalParticipant already exists'], 422);
+                Alert::error('Gagal!', 'JadwalParticipant sudah ada!');
                 return back()->withErrors(['message' => 'JadwalParticipant already exists'])->withInput();
             }
         }
 
         $jadwalParticipant->update($validated);
 
-        // return response()->json($jadwalParticipant->load(['shift', 'participant']));
+        Alert::success('Berhasil!', 'JadwalParticipant berhasil diupdate 🎉');
         return redirect()->route('jadwalParticipant.index')->with('success', 'JadwalParticipant updated successfully');
     }
 
     // Delete a jadwal participant
     public function destroy(Request $request)
     {
-        // dd($request->all());
         $validator = Validator::make($request->all(), [
             'id_shift' => 'required|exists:shifts,id',
         ]);
         if ($validator->fails()) {
-            // return response()->json($validated->errors(), 422);
+            Alert::error('Gagal!', 'Validasi gagal!');
             return back()->withErrors($validator)->withInput();
         }
 
@@ -190,7 +163,7 @@ class JadwalParticipantController extends Controller
                 ->delete();
         }
 
-        // return response()->json(['message' => 'JadwalParticipant deleted']);
+        Alert::success('Berhasil!', 'JadwalParticipant berhasil dihapus 🎉');
         return redirect()->route('jadwalParticipant.index')->with('success', 'JadwalParticipant deleted successfully');
     }
 }

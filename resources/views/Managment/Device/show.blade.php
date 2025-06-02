@@ -43,7 +43,7 @@
                 </div>
             </div>
             <div class="mt-4 pt-2 border-top d-flex justify-content-end gap-2">
-                <a href="{{ route('device.edit', $device->id) }}" class="btn btn-primary">
+                <a href="{{ route('device.edit', Crypt::encrypt($device->id)) }}" class="btn btn-primary">
                     <i class="ti ti-edit me-1"></i> Edit
                 </a>
                 <a href="{{ route('device.index') }}" class="btn btn-outline-secondary">

@@ -86,9 +86,9 @@
                                     </tr>
                                 </thead>
                                 <tbody class="border-top-0">
-                                    @forelse ($groups as $group)
+                                    @forelse ($groups as $key => $group)
                                     <tr>
-                                        <td class="ps-4 fw-semibold">{{ $group->id }}</td>
+                                        <td class="ps-4 fw-semibold">{{ $key + 1 }}</td>
                                         <td>
                                             <div class="d-flex align-items-center gap-3">
                                                 <div class="d-flex flex-column">
@@ -99,7 +99,7 @@
                                         </td>
                                         <td class="text-end pe-4">
                                             <div class="d-flex gap-2 justify-content-end">
-                                                <form action="{{ route('groupLibur.destroyItem', ['id_group' => $group->id, 'id_waktu_libur' => $waktuLibur->id]) }}" method="POST" class="d-inline">
+                                                <form action="{{ route('groupLibur.destroyItem', ['id_group' => Crypt::encrypt($group->id), 'id_waktu_libur' => Crypt::encrypt($waktuLibur->id)]) }}" method="POST" class="d-inline">
                                                     @csrf
                                                     @method('DELETE')
                                                     <button type="submit" class="btn btn-sm btn-icon btn-outline-danger rounded-3"

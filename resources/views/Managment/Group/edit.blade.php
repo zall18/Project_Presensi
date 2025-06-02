@@ -3,7 +3,7 @@
 @section('container')
 <div class="container mt-4">
     <h3 class="mb-4">Edit Group</h3>
-    <form action="{{ route('group.update', $group->id) }}" method="POST">
+    <form action="{{ route('group.update', Crypt::encrypt($group->id)) }}" method="POST">
         @csrf
         @method('PUT')
         <div class="mb-3">
