@@ -4,8 +4,8 @@
 <div class="container mt-4">
     <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-4 gap-3">
         <div>
-            <h3 class="fw-semibold mb-1">Add Participants to Group</h3>
-            <p class="text-muted mb-0">Select participants to add to this group</p>
+            <h3 class="fw-semibold mb-1">Remove Participants to Group</h3>
+            <p class="text-muted mb-0">Select participants to remove to this group</p>
         </div>
         <a href="{{ route('group.show', Crypt::encrypt($group->id)) }}" class="btn btn-outline-secondary">
             <i class="ti ti-arrow-left me-1"></i> Back to Group List
@@ -24,8 +24,9 @@
 
     <div class="card shadow-sm border-0">
         <div class="card-body">
-            <form action="{{ route('groupParticipant.store') }}" method="POST">
+            <form action="{{ route('groupParticipant.destroy') }}" method="POST">
                 @csrf
+                @method('DELETE');
                 <input type="hidden" name="group_id" value="{{ $group->id }}">
                 <div class="table-responsive">
                     <table class="table table-bordered align-middle">
@@ -54,12 +55,7 @@
                                     <td class="text-center">
                                         <input type="checkbox"
                                                value="{{ $participant->id }}"
-                                               @if(in_array($participant->id, $groupParticipantIds ?? []))
-                                                    checked disabled
-                                                    {{-- Don't include name so it won't be submitted --}}
-                                                @else
-                                                    name="participants[]"
-                                                @endif
+                                               name="participants[]"
                                                >
                                     </td>
                                 </tr>

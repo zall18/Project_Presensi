@@ -80,6 +80,8 @@
                     </div>
 
                     <!-- Toleransi Terlambat (menit) -->
+
+
                     <div class="col-md-3">
                         <div class="form-floating">
                             <input type="number"
@@ -144,6 +146,23 @@
                                    required>
                             <label for="jam_mulai_scan_keluar">Jam Mulai Scan Keluar</label>
                             @error('jam_mulai_scan_keluar')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+                    </div>
+
+                    <div class="col-md-3">
+                        <div class="form-floating">
+                            <input type="number"
+                                   class="form-control @error('toleransi_check_out') is-invalid @enderror"
+                                   id="toleransi_check_out"
+                                   name="toleransi_check_out"
+                                   placeholder="Toleransi Check Out"
+                                   value="{{ old('toleransi_check_out', 0) }}"
+                                   min="0"
+                                   required>
+                            <label for="toleransi_check_out">Toleransi Check Out (Jam)</label>
+                            @error('toleransi_check_out')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>

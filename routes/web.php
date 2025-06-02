@@ -13,6 +13,7 @@ use App\Http\Controllers\ShiftController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\WaktuLiburController;
 use Illuminate\Support\Facades\Route;
+use App\Models\Group;
 
 /*
 |--------------------------------------------------------------------------
@@ -28,11 +29,16 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', [UserController::class, 'dashboard'])->name('dashboard');
 
 Route::resource('user', UserController::class);
+Route::get('/participant/import', [ParticipantsController::class, 'importView'])->name('participant.import');
+Route::post('/participant/import', [ParticipantsController::class, 'import'])->name('participant.import.data');
 Route::resource('participant', ParticipantsController::class);
+
 Route::resource('group', GroupsController::class);
-Route::resource('groupParticipant', GroupParticipantController::class);
+Route::delete('/groupParticipant/destroy', [GroupParticipantController::class, 'destroy'])->name('groupParticipant.destroy');
+Route::resource('groupParticipant', GroupParticipantController::class)->except('destroy');
 
 Route::get('group/{id}/addParticipant', [GroupsController::class, 'addParticipant'])->name('group.addParticipant');
+Route::get('group/{id}/removeParticipant', [GroupsController::class, 'removeParticipant'])->name('group.removeParticipant');
 
 Route::resource('jamKerja', jamKerjaController::class);
 Route::resource('shift', ShiftController::class);
@@ -50,3 +56,11 @@ Route::resource('device', DeviceController::class);
 Route::resource('waktuLibur', WaktuLiburController::class);
 Route::delete('groupLibur/{id_group}/{id_waktu_libur}/destroy', [GroupLiburController::class, 'destroy'])->name('groupLibur.destroyItem');
 // Route::resource('groupLibur', GroupLiburController::class);
+
+Route::get('/export-participant', [ParticipantsController::class, 'exportAll'])->name('export.participant');
+Route::get('/export-participant/{id}', [ParticipantsController::class, 'exportByGroup'])->name('export.participant.group');
+
+Route::get('/test', function() {
+    $test = Group::with('participants')->find(1)->participants->select('no_induk', 'nama', 'id_kartu', 'no_hp', 'alamat')->count();
+    return response()->json($test);
+});

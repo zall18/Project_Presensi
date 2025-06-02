@@ -39,13 +39,17 @@
                         <div class="form-control bg-light">{{ $jamKerja->jam_mulai_scan_keluar }}</div>
                     </div>
                     <div class="mb-3">
+                        <label class="form-label fw-semibold">Toleransi Check Out (Jam)</label>
+                        <div class="form-control bg-light">{{ $jamKerja->toleransi_check_out ?? '-' }}</div>
+                    </div>
+                    <div class="mb-3">
                         <label class="form-label fw-semibold">Toleransi Keterlambatan Masuk (menit)</label>
                         <div class="form-control bg-light">{{ $jamKerja->toleransi_terlambat ?? '-' }}</div>
                     </div>
                     <div class="mb-3">
                         <label class="form-label fw-semibold">Toleransi Keterlambatan Pulang (menit)</label>
                         <div class="form-control bg-light">{{ $jamKerja->toleransi_pulang_cepat ?? '-' }}</div>
-                    </div>                    
+                    </div>
                     <div class="mb-3">
                         <label class="form-label fw-semibold">Dibuat Pada</label>
                         <div class="form-control bg-light">{{ $jamKerja->created_at->format('d M Y H:i') }}</div>

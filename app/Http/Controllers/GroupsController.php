@@ -62,6 +62,22 @@ class GroupsController extends Controller
         return view('Managment.Group.groupParticipant.create', compact('group', 'participants', 'groupParticipantIds'));
     }
 
+    public function removeParticipant($id)
+    {
+        $groupId = Crypt::decrypt($id);
+        $group = Group::find($groupId);
+        if (!$group) {
+            Alert::error('Gagal!', 'Group tidak ditemukan!');
+            return redirect()->route('group.index');
+        }
+
+        $participants = Group::with('participants')->find($groupId)->participants;
+        return view('Managment.Group.groupParticipant.remove', compact('group', 'participants'));
+
+    }
+
+
+
     // Show a single group
     public function show(Request $request, $id)
     {

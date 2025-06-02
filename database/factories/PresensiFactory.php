@@ -21,6 +21,7 @@ class PresensiFactory extends Factory
             'id_participant' => \App\Models\Participant::factory(),
             'waktu_masuk' => $masuk,
             'waktu_keluar' => (clone $masuk)->modify('+9 hours'),
+            'status_check_out' => $this->faker->randomElement(['belum', 'sudah']),
             'id_device' => \App\Models\Device::factory(),
             'id_shift' => \App\Models\Shift::factory(),
         ];

@@ -16,6 +16,7 @@ return new class extends Migration
             $table->foreignId('id_participant')->constrained('participants')->onDelete('cascade');
             $table->dateTime('waktu_masuk');
             $table->dateTime('waktu_keluar')->nullable();
+            $table->enum('status_check_out', ['sudah', 'belum'])->default('belum');
             $table->foreignId('id_device')->constrained('devices')->onDelete('cascade');
             $table->foreignId('id_shift')->constrained('shifts')->onDelete('cascade');
             $table->timestamps();

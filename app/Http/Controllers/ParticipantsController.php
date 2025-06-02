@@ -3,10 +3,17 @@
 namespace App\Http\Controllers;
 
 use App\Models\Participant;
+use App\Models\Group;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Crypt;
 use RealRashid\SweetAlert\Facades\Alert;
+use Maatwebsite\Excel\Validators\ValidationException;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Imports\ParticipantImport;
+use App\Exports\ParticipantExport;
+use App\Exports\ParticipantGroupExport;
+
 
 
 class ParticipantsController extends Controller
@@ -77,6 +84,7 @@ class ParticipantsController extends Controller
 
         // return response()->json($participant);
         return view('Managment.Participant.show', compact('participant', 'presensis'));
+        // return view('Managment.Participant.import');
     }
 
     // show a participant by id_kartu
@@ -145,4 +153,50 @@ class ParticipantsController extends Controller
         // return response()->json(['message' => 'Participant deleted']);
         return back()->with('success', 'Participant deleted successfully');
     }
+
+    public function importView() {
+        return view('Managment.Participant.import');
+    }
+
+    public function import(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|mimes:xlsx,xls'
+        ]);
+
+        $import = new ParticipantImport;
+        $import->import($request->file('file'));
+
+        if ($import->failures()->isNotEmpty()) {
+            $messages = [];
+
+            foreach ($import->failures() as $failure) {
+                $messages[] = "Baris {$failure->row()}: " . implode(', ', $failure->errors());
+            }
+
+            Alert::error('Import Gagal', 'Beberapa data gagal diimpor.');
+            return back()->withErrors($messages);
+        }
+
+        Alert::success('Import Berhasil', 'Data peserta berhasil diimpor!');
+        return redirect()->route('participant.index');
+    }
+
+    public function exportAll() {
+        return Excel::download(new ParticipantExport, 'all-participant.xlsx');
+    }
+
+    public function exportByGroup($id)
+    {
+
+        $groupId = Crypt::decrypt($id);
+        $group = Group::find($groupId);
+
+        if(!$group) {
+            return response()->json(['message' => 'Group not found'], 404);
+        }
+
+        return Excel::download(new ParticipantGroupExport($group->id), 'peserta_group_' . $group->nama . '.xlsx');
+    }
+
 }

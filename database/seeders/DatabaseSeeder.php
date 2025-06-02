@@ -23,11 +23,7 @@ class DatabaseSeeder extends Seeder
         $groups = \App\Models\Group::factory(5)->create();
 
         // 2. Buat 10 peserta dan assign ke group acak
-        $participants = \App\Models\Participant::factory(10)->create()->each(function ($participant) use ($groups) {
-            $participant->groups()->attach(
-                $groups->random(1)->pluck('id')->toArray()
-            );
-        });
+        $participants = \App\Models\Participant::factory(10)->create();
 
         // 3. Buat 3 jam kerja
         $jamKerjas = \App\Models\JamKerja::factory(3)->create();

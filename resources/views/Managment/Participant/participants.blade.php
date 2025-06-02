@@ -7,9 +7,17 @@
             <h3 class="fw-semibold mb-1">Participant Management</h3>
             <p class="text-muted mb-0">Manage all registered participant in the system</p>
         </div>
-        <a href="{{ route('participant.create') }}" class="btn btn-success d-flex align-items-center">
-            <i class="ti ti-plus me-1"></i> Add New Participant
-        </a>
+        <div class="d-flex gap-2">
+            <a href="{{ route('participant.create') }}" class="btn btn-success d-flex align-items-center">
+                <i class="ti ti-plus me-1"></i> Add New Participant
+            </a>
+            <a href="{{ route('export.participant') }}" class="btn btn-success d-flex align-items-center">
+                <i class="ti ti-file-spreadsheet me-1"></i> Export Participant
+            </a>
+            <a href="{{ route('participant.import') }}" class="btn btn-success d-flex align-items-center">
+                <i class="ti ti-file-spreadsheet me-1"></i> Import Participant
+            </a>
+        </div>
     </div>
 
     <div class="card shadow-sm border-0 overflow-hidden">

@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use App\Models\GroupParticipant;
 use Illuminate\Support\Facades\Validator;
 use RealRashid\SweetAlert\Facades\Alert;
+use Illuminate\Support\Facades\Crypt;
+
 
 class GroupParticipantController extends Controller
 {
@@ -20,14 +22,6 @@ class GroupParticipantController extends Controller
     public function store(Request $request)
     {
         foreach ($request->participants as $id) {
-            // Check if the participant is already in the group
-            $existingGroupParticipant = GroupParticipant::where('id_participant', $id)
-                ->first();
-            if ($existingGroupParticipant) {
-                GroupParticipant::where('id_participant', $id)
-                    ->update(['id_group' => $request->group_id]);
-                continue;
-            }
             GroupParticipant::create([
                 'id_group' => $request->group_id,
                 'id_participant' => $id,
@@ -35,7 +29,7 @@ class GroupParticipantController extends Controller
         }
 
         Alert::success('Berhasil!', 'GroupParticipant berhasil ditambahkan 🎉');
-        return redirect()->route('group.show', $request->group_id)->with('success', 'GroupParticipant created successfully');
+        return redirect()->route('group.show', Crypt::encrypt($request->group_id))->with('success', 'GroupParticipant created successfully');
     }
 
     // Show a single group participant
@@ -81,18 +75,12 @@ class GroupParticipantController extends Controller
     }
 
     // Delete a group participant
-    public function destroy(Request $request ,$id)
+    public function destroy(Request $request)
     {
-        $groupParticipant = GroupParticipant::where('id_participant', $id)->first();
-
-        if (!$groupParticipant) {
-            Alert::error('Gagal!', 'GroupParticipant tidak ditemukan!');
-            return redirect()->route('group.show', $request->group_id)->withErrors(['message' => 'GroupParticipant not found']);
+        foreach ($request->participants as $id) {
+            GroupParticipant::where('id_participant', $id)
+                ->where('id_group', $request->group_id)->delete();
         }
-
-        $groupParticipant->delete();
-
-        Alert::success('Berhasil!', 'GroupParticipant berhasil dihapus 🎉');
-        return redirect()->route('group.show', $request->group_id)->with('success', 'GroupParticipant deleted successfully');
+        return redirect()->route('group.show', Crypt::encrypt($request->group_id))->with('success', 'GroupParticipant deleted successfully');
     }
 }

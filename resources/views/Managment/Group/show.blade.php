@@ -17,16 +17,24 @@
             <input type="text" class="form-control" id="nama" name="nama" value="{{ old('nama', $group->nama) }}" disabled>
         </div>
     </form>
+        <div>
+            <a href="{{ route('export.participant.group', Crypt::encrypt($group->id)) }}">
+                <button class="btn btn-success w-100 my-3">
+                     Export Group Participant
+                </button>
+            </a>
+        </div>
     <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-4 gap-3">
         <div>
             <h3 class="fw-semibold mb-1">Group Participant</h3>
             <p class="text-muted mb-0">Manage all group participant in the system</p>
         </div>
+
         <div>
             <a href="{{ route('group.addParticipant', Crypt::encrypt($group->id)) }}" class="btn btn-success d-flex align-items-center">
                 <i class="ti ti-plus me-1"></i> Add/Update Group Participant
             </a>
-            <a href="{{ route('group.addParticipant', Crypt::encrypt($group->id)) }}" class="btn btn-danger d-flex align-items-center mt-2">
+            <a href="{{ route('group.removeParticipant', Crypt::encrypt($group->id)) }}" class="btn btn-danger d-flex align-items-center mt-2">
                 <i class="ti ti-minus me-1"></i> Remove Group Participant
             </a>
         </div>
