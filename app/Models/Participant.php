@@ -23,6 +23,6 @@ class Participant extends Model
 
     public function presensi()
     {
-        return $this->hasMany(Presensi::class, 'id_participant');
+        return $this->hasMany(Presensi::class);
     }
 }

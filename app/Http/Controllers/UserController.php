@@ -13,11 +13,14 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Crypt;
 use RealRashid\SweetAlert\Facades\Alert;
+use Illuminate\Support\Facades\Auth;
+
 
 
 
 class UserController extends Controller
 {
+    
 
     public function dashboard()
     {
@@ -127,7 +130,7 @@ class UserController extends Controller
         if ($validator->fails()) {
             // return response()->json($validator->errors(), 422);
             return back()->withErrors($validator)->withInput();
-            
+
         }
 
         $validated = $validator->validate();

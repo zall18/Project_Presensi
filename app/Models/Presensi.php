@@ -17,7 +17,7 @@ class Presensi extends Model
     }
 
     public function shift(){
-        return $this->belongsTo(Shift::class);
+        return $this->belongsTo(Shift::class, 'id_shift');
     }
 
     public function participant()

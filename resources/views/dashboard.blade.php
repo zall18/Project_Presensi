@@ -25,7 +25,7 @@
           </div> --}}
           <div class="col-lg-12">
             <div class="row">
-              
+
               <div class="col-lg-4">
                 <!-- Monthly Earnings -->
                 <div class="card">
@@ -107,24 +107,22 @@
                     <table class="table table-hover align-middle mb-0">
                         <thead class="table-light text-nowrap">
                             <tr>
-                                <th class="ps-4">
-                                    ID
-                                </th>
                                 <th>
                                     Participant
                                 </th>
                                 <th>Waktu Masuk</th>
                                 <th>Waktu Keluar</th>
+                                <th>Status Terlambat</th>
                                 <th>Device</th>
                             </tr>
                         </thead>
                         <tbody class="border-top-0">
                             @forelse ($presensis as $key => $presensi)
                             <tr>
-                                <td class="ps-4 fw-semibold">{{ $key + 1 }}</td>
                                 <td>{{ $presensi->participant->nama ?? "-"}}</td>
                                 <td>{{ $presensi->waktu_masuk }}</td>
                                 <td>{{ $presensi->waktu_keluar }}</td>
+                                <td>{{ $presensi->status_terlambat ? 'Terlambat' : "Tepat Waktu" }}</td>
                                 <td>{{ $presensi->device->nama }}</td>
                             </tr>
                             @empty

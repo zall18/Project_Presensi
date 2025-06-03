@@ -14,9 +14,10 @@
     @endif
     <form action="{{ route('detail-shifts.store') }}" method="POST">
         @csrf
+        <input type="hidden" name="shift_id" value="{{ Crypt::encrypt($shift->id) }}">
         <div class="card shadow-sm border-0 overflow-hidden">
             <div class="card-header bg-transparent border-0 pt-3 pb-2">
-                
+
             </div>
 
             <div class="card-body p-0">
@@ -135,25 +136,21 @@
                     </table>
                 </div>
             </div>
-            @if($groups->hasPages())
-            <div class="card-footer bg-transparent border-0 py-3">
-                <div class="d-flex flex-column flex-md-row justify-content-between align-items-center">
-                    <div class="mb-2 mb-md-0">
-                        <p class="small text-muted mb-0">
-                            Showing {{ $groups->firstItem() }} to {{ $groups->lastItem() }} of {{ $groups->total() }} entries
-                        </p>
-                    </div>
-                    <nav aria-label="Page navigation">
-                        <ul class="pagination pagination-sm mb-0">
-                            {{ $groups->appends(request()->query())->onEachSide(1)->links() }}
-                        </ul>
-                    </nav>
-                </div>
-            </div>
-            @endif
         </div>
         <button type="submit" class="btn btn-primary">Create</button>
         <a href="{{ route('shift.show', Crypt::encrypt($shift->id)) }}" class="btn btn-secondary">Cancel</a>
     </form>
 </div>
+<script>
+        function toggleAllCheckboxes(source) {
+        if (!source.checked) {
+            document.getElementById('all_checked').checked = false;
+
+        }
+        const checkboxes = document.querySelectorAll('input[name="days[]"]');
+        checkboxes.forEach(checkbox => {
+            checkbox.checked = source.checked;
+        });
+    }
+</script>
 @endsection

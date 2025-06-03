@@ -19,8 +19,15 @@
     </form>
         <div>
             <a href="{{ route('export.participant.group', Crypt::encrypt($group->id)) }}">
-                <button class="btn btn-success w-100 my-3">
-                     Export Group Participant
+                <button class="btn btn-primary w-100 my-3">
+                    <i class="ti ti-file-spreadsheet me-1"></i> Export Group Participant
+                </button>
+            </a>
+        </div>
+        <div>
+            <a href="{{ route('export.presensi.group', Crypt::encrypt($group->id)) }}">
+                <button class="btn btn-success w-100 mb-2">
+                    <i class="ti ti-file-spreadsheet me-1"></i> Export Recap Presensi Participant
                 </button>
             </a>
         </div>

@@ -43,6 +43,17 @@ class DatabaseSeeder extends Seeder
             ]);
         }
 
+        foreach ($participants as $participant) {
+            $assignedGroups = $groups->random(rand(1, 2));
+
+            foreach ($assignedGroups as $group) {
+                \App\Models\GroupParticipant::factory()->create([
+                    'id_participant' => $participant->id,
+                    'id_group' => $group->id,
+                ]);
+            }
+        }
+
         // 6. Buat 2 device
         $devices = \App\Models\Device::factory(2)->create();
 

@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Presensi SMK YPC TASIKMALAYA</title>
+  <title>Managment Presensi SMK YPC TASIKMALAYA</title>
   <link rel="shortcut icon" type="image/png" href="{{ asset('images/profile/YPC.png') }}" />
   <link rel="stylesheet" href="{{ asset('css/styles.min.css') }}" />
   <style>

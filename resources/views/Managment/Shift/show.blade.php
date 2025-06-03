@@ -34,34 +34,10 @@
                     <thead class="table-light text-nowrap">
                         <tr>
                             <th class="ps-4">
-                                <a href="{{ route('participant.index', [
-                                    'sort' => 'id',
-                                    'direction' => request('sort') == 'id' && request('direction') == 'asc' ? 'desc' : 'asc',
-                                    'search' => request('search'),
-                                ]) }}" class="text-decoration-none text-dark d-flex align-items-center gap-1">
-                                    <span>ID</span>
-                                    @if(request('sort') == 'id')
-                                    <i class="ti ti-arrows-sort fs-4 text-primary"></i>
-                                    <i class="ti ti-arrow-{{ request('direction') == 'asc' ? 'up' : 'down' }} fs-4 text-primary"></i>
-                                    @else
-                                    <i class="ti ti-arrows-sort fs-4 text-muted opacity-50"></i>
-                                    @endif
-                                </a>
+                                ID
                             </th>
                             <th>
-                                <a href="{{ route('participant.index', [
-                                    'sort' => 'nama',
-                                    'direction' => request('sort') == 'nama' && request('direction') == 'asc' ? 'desc' : 'asc',
-                                    'search' => request('search'),
-                                ]) }}" class="text-decoration-none text-dark d-flex align-items-center gap-1">
-                                    <span>Hari</span>
-                                    @if(request('sort') == 'nama')
-                                    <i class="ti ti-arrows-sort fs-4 text-primary"></i>
-                                    <i class="ti ti-arrow-{{ request('direction') == 'asc' ? 'up' : 'down' }} fs-4 text-primary"></i>
-                                    @else
-                                    <i class="ti ti-arrows-sort fs-4 text-muted opacity-50"></i>
-                                    @endif
-                                </a>
+                                Hari
                             </th>
                             <th class="text-end pe-4">Actions</th>
                         </tr>

@@ -4,9 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Models\Group;
 use App\Models\Presensi;
+use App\Models\Shift;
 use App\Models\Participant;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\PresensiGroupExport;
+use Illuminate\Support\Facades\Crypt;
 
 class PresensiController extends Controller
 {
@@ -183,5 +187,57 @@ class PresensiController extends Controller
         $presensi->delete();
 
         return redirect()->route('presensi.index')->with('success', 'Presensi deleted successfully.');
+    }
+
+    public function test(Request $request) {
+        $group = Group::find($request->id);
+
+        if(!$group){
+            return response()->json('Group not found', 404);
+        }
+
+        $totalDay = Presensi::with('shift');
+        $presensi = Presensi::with('participant', 'shift')->whereHas('participant.groupParticipants.group', function($query) use ($group) {
+            $query->where('id_group', $group->id);
+        })->get();
+        $shift = $presensi->pluck('shift.tanggal_mulai');
+        $today = Carbon::today();
+        $totalHari = $shift->map(function ($date) use($today) {
+            $tanggalMulai = Carbon::parse($date);
+            $totalDay = $tanggalMulai->diffInDays($today) + 1; // +1 jika ingin termasuk hari mulai
+            return $totalDay;
+        });
+
+
+
+        $dataPresensi = $presensi->map(function($data, $index) use($totalHari, $presensi) {
+            $totalMasuk = $presensi->where('id_participant', $data->participant->id)->count();
+            $totalTelat = $presensi->where('id_participant', $data->participant->id)->where('status_terlambat', true)->count();
+            $totalTidakCO = $presensi->where('id_participant', $data->participant->id)->where('status_check_out')->where('status_check_out', false)->count();
+
+            return [
+                "participant" => $data->participant->nama,
+                "TotalHari" => $totalHari[$index],
+                "TotalMasuk" => $totalMasuk,
+                "totalTelat" => $totalTelat,
+                "totalTidakMasuk" => $totalHari[$index] - $totalMasuk,
+                "totalTidakCheckOut" => $totalTidakCO
+            ];
+        });
+        // $startDate = $shift->tanggal_mulai;
+
+        return response()->json($dataPresensi);
+    }
+
+    public function presensiExport($id)
+    {
+        $groupId = Crypt::decrypt($id);
+        $group = Group::find($groupId);
+
+        if(!$group) {
+            return response()->json(['message' => 'Group not found'], 404);
+        }
+
+        return Excel::download(new PresensiGroupExport($group->id, $group->nama), 'report_presensi_group_' . $group->nama . '.xlsx');
     }
 }

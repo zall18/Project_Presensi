@@ -87,6 +87,10 @@ class ShiftController extends Controller
             Alert::error('Gagal!', 'Shift tidak ditemukan!');
             return redirect()->route('shift.index');
         }
+        $urutanHari = ['Senin','Selasa','Rabu','Kamis','Jumat','Sabtu','Minggu'];
+        $shift->detailShifts = $shift->detailShifts->sortBy(function($item) use ($urutanHari) {
+            return array_search($item->hari, $urutanHari);
+        })->values();
         return view('Managment.Shift.show', compact('shift'));
     }
 
