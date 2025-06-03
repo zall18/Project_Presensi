@@ -23,22 +23,13 @@ class DetailShiftController extends Controller
     {
         $shiftId = Crypt::decrypt($request->shift_id);
         $validated = Validator::make($request->all(), [
-            'hari' => 'required|string|max:20',
+            'days' => 'required',
         ]);
         if ($validated->fails()) {
             Alert::error('Gagal!', 'Validasi gagal!');
             return back()->withErrors($validated)->withInput();
         }
         $validated = $validated->validated();
-
-        // Check if the detail shift already exists
-        $existingDetailShift = DetailShift::where('id_shift', $shiftId)
-            ->where('hari', $validated['hari'])
-            ->first();
-        if ($existingDetailShift) {
-            Alert::error('Gagal!', 'DetailShift sudah ada!');
-            return back()->withErrors(['message' => 'DetailShift already exists'])->withInput();
-        }
 
         // Validate shift exists
         $shift = Shift::find($shiftId);
@@ -48,7 +39,12 @@ class DetailShiftController extends Controller
         }
         $validated['id_shift'] = $shiftId;
 
-        $detailShift = DetailShift::create($validated);
+        foreach($request->days as $day) {
+            DetailShift::create([
+                'hari' => $day,
+                'id_shift' => $shiftId
+            ]);
+        }
 
         Alert::success('Berhasil!', 'DetailShift berhasil dibuat 🎉');
         return redirect()->route('shift.show', $request->shift_id)->with('success', 'DetailShift created successfully');

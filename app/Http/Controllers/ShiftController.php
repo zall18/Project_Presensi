@@ -44,7 +44,9 @@ class ShiftController extends Controller
             Alert::error('Gagal!', 'Shift tidak ditemukan!');
             return redirect()->route('shift.index');
         }
-        return view('Managment.Shift.detailShift.create', compact('shift'));
+        $detailShiftHari = $shift->detailShifts->pluck('hari')->toArray();
+        // return response()->json($detailShiftHari);
+        return view('Managment.Shift.detailShift.create', compact('shift', 'detailShiftHari'));
     }
 
     // Store a new shift
