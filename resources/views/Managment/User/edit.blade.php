@@ -12,7 +12,7 @@
                     type="text"
                     class="form-control"
                     id="username"
-                    name="name"
+                    name="name" 
                     value="{{ old('name', $user->name) }}"
                     required>
             </div>

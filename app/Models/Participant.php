@@ -18,11 +18,11 @@ class Participant extends Model
 
     public function groupParticipants()
     {
-        return $this->hasOne(GroupParticipant::class, 'id_participant');
+        return $this->hasMany(GroupParticipant::class, 'id_participant');
     }
 
     public function presensi()
     {
-        return $this->hasMany(Presensi::class);
+        return $this->hasMany(Presensi::class, 'id_participant');
     }
 }

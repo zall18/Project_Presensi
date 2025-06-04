@@ -75,12 +75,13 @@ class ParticipantsController extends Controller
     public function show($id)
     {
         $participantId = Crypt::decrypt($id);
-        $participant = Participant::with('groupParticipants')->find($participantId);
+        $participant = Participant::with('groupParticipants', 'groupParticipants.group', 'presensi')->find($participantId);
         if (!$participant) {
             return response()->json(['message' => 'Participant not found'], 404);
         }
         $presensis = $participant->presensi;
-        // return response()->json($presensis);
+        $groupParticipant = $participant->groupParticipants;
+        // return response()->json($groupParticipant);
 
         // return response()->json($participant);
         return view('Managment.Participant.show', compact('participant', 'presensis'));

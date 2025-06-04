@@ -55,4 +55,4 @@ Route::apiResource('libur', WaktuLiburController::class);
 
 Route::apiResource('group-libur', GroupLiburController::class);
 
-Route::get('presensi/{id_participant}', [PresensiController::class, 'store']);
+Route::get('presensi/{api_key}/{id_device}/{id_kartu}', [PresensiController::class, 'store']);

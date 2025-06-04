@@ -70,7 +70,7 @@
 
                 <div class="mt-4 pt-2 border-top">
                     <button type="submit" class="btn btn-primary px-4">
-                        <i class="ti ti-users-plus me-1"></i> Save Group Participants
+                        <i class="ti ti-users-plus me-1"></i> Remove Group Participants
                     </button>
                     <a href="{{ route('groupParticipant.index') }}" class="btn btn-outline-secondary ms-2">
                         <i class="ti ti-reload me-1"></i> Cancel

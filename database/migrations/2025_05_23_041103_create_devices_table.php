@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('nama', 100);
             $table->string('device_id', 50)->unique();
             $table->string('lokasi', 150)->nullable();
+            $table->string('api_key')->nullable();
             $table->enum('status', ['active', 'inactive'])->default('active');
             $table->timestamps();
         });

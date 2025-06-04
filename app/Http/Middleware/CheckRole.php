@@ -22,7 +22,7 @@ class CheckRole
         $user = auth()->user();
 
         if (!in_array($user->level, $roles)) {
-            abort(403); // atau redirect ke halaman lain
+            return redirect()->route('login');
         }
 
         return $next($request);

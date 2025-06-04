@@ -4,12 +4,9 @@
 <div class="container mt-4">
     <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-4 gap-3">
         <div>
-            <h3 class="fw-semibold mb-1">Detail User</h3>
+            <h3 class="fw-semibold mb-1">My Profile</h3>
             <p class="text-muted mb-0">Informasi lengkap user</p>
         </div>
-        <a href="{{ route('user.index') }}" class="btn btn-outline-secondary">
-            <i class="ti ti-arrow-left me-1"></i> Kembali ke Daftar User
-        </a>
     </div>
 
     <div class="card shadow-sm border-0">
@@ -45,7 +42,7 @@
                 </div>
             </div>
             <div class="mt-4 pt-2 border-top d-flex justify-content-end gap-2">
-                <a href="{{ route('user.edit', Crypt::encrypt($user->id)) }}" class="btn btn-primary">
+                <a href="{{ route('me.update') }}" class="btn btn-primary">
                     <i class="ti ti-edit me-1"></i> Edit
                 </a>
                 <a href="{{ route('user.index') }}" class="btn btn-outline-secondary">

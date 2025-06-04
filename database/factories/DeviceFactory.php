@@ -3,6 +3,7 @@
 namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Str;
 
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Device>
@@ -20,6 +21,7 @@ class DeviceFactory extends Factory
             'nama' => 'Device ' . $this->faker->word(),
             'device_id' => strtoupper($this->faker->bothify('SN###')),
             'lokasi' => $this->faker->address(),
+            'api_key' => Str::random(32),
             'status' => $this->faker->randomElement(['active', 'inactive']),
         ];
     }

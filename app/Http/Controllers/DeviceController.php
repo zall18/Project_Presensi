@@ -4,8 +4,11 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Device;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 use RealRashid\SweetAlert\Facades\Alert;
 
 class DeviceController extends Controller
@@ -47,6 +50,7 @@ class DeviceController extends Controller
             return back()->withErrors($validated)->withInput();
         }
         $validated = $validated->validated();
+        $validated['api_key'] = Str::random(32);
 
         $device = Device::create($validated);
 
@@ -130,5 +134,21 @@ class DeviceController extends Controller
 
         Alert::success('Berhasil!', 'Device berhasil dihapus 🎉');
         return redirect()->route('device.index')->with('success', 'Device deleted successfully');
+    }
+
+    public function verifyPassword(Request $request)
+    {
+        $request->validate([
+            'password' => 'required|string',
+            'device_id' => 'required|integer',
+        ]);
+
+        $user = Auth::user();
+        if (!Hash::check($request->password, $user->password)) {
+            return response()->json(['message' => 'Password salah'], 401);
+        }
+
+        $device = Device::findOrFail($request->device_id);
+        return response()->json(['api_key' => $device->api_key]);
     }
 }

@@ -16,8 +16,8 @@ class Group extends Model
         return $this->belongsToMany(Participant::class, 'group_participants', 'id_group', 'id_participant');
     }
 
-    public function grupLibur() {
-        return $this->hasMany(GroupLibur::class, 'group_liburs');
+    public function groupLiburs() {
+        return $this->hasMany(GroupLibur::class, 'id_group');
     }
 
     public function groupParticipants()

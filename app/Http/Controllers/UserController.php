@@ -37,19 +37,20 @@ class UserController extends Controller
     public function index(Request $request)
     {
         // $users = User::all();
-        $users = User::paginate(10); // Default pagination
+        $userId = Auth::user()->id;
+        $users = User::where('id', '!=', $userId)->paginate(10); // Default pagination
 
 
         if ($request->level){
-            $users = User::where('level', $request->level)->paginate(10);
+            $users = User::where('level', $request->level)->where('id', '!=', $userId)->paginate(10);
         } elseif ($request->search) {
-            $users = User::where('name', 'like', '%' . $request->search . '%')
+            $users = User::where('id', '!=', $userId)->where('name', 'like', '%' . $request->search . '%')
                 ->orWhere('email', 'like', '%' . $request->search . '%')
                 ->paginate(10);
         } elseif ($request->sort && $request->direction) {
-            $users = User::orderBy($request->sort, $request->direction)->paginate(10);
+            $users = User::where('id', '!=', $userId)->orderBy($request->sort, $request->direction)->paginate(10);
         } else {
-            $users = User::paginate(10);
+            $users = User::where('id', '!=', $userId)->paginate(10);
         }
 
 
@@ -77,6 +78,10 @@ class UserController extends Controller
 
         if ($validator->fails()) {
             return response()->json($validator->errors(), 422);
+        }
+
+        if($request->password != $request->password_confirmation){
+            return back()->withErrors(['password_confirmation' => 'Komfirmasi password tidak sama!'])->withInput();
         }
         $validated = $validator->validated();
         $validated['password'] = Hash::make($validated['password']);
@@ -114,6 +119,7 @@ class UserController extends Controller
     // Update the specified user
     public function update(Request $request, $id)
     {
+        // dd($request->all());
         $userId = Crypt::decrypt($id);
         $user = User::find($userId);
         if (!$user) {
@@ -123,7 +129,6 @@ class UserController extends Controller
         $validator = Validator::make($request->all(), [
             'name' => 'sometimes|required|string|max:255',
             'email' => 'sometimes|required|email',
-            'password' => 'sometimes|required|string|min:6',
             'level' => 'sometimes|required|in:admin,operator',
         ]);
 
@@ -134,8 +139,13 @@ class UserController extends Controller
         }
 
         $validated = $validator->validate();
-        if (isset($validated['password'])) {
-            $validated['password'] = Hash::make($validated['password']);
+        // dd($validated);
+        if($request->password != null)
+        {
+            $validated['password'] = $request->password;
+            if (isset($validated['password'])) {
+                $validated['password'] = Hash::make($validated['password']);
+            }
         }
 
         $user->update($validated);
@@ -158,5 +168,15 @@ class UserController extends Controller
         Alert::success('Berhasil!', 'User berhasil dihapus 🎉');
 
         return back()->with('success', 'User deleted successfully');
+    }
+
+    public function me() {
+        $user = Auth::user();
+        return view('managment.user.me', compact('user'));
+    }
+
+    public function meUpdate() {
+        $user = Auth::user();
+        return view('Managment.User.editProfile', compact('user'));
     }
 }

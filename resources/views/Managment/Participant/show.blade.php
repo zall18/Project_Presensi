@@ -32,7 +32,13 @@
                 <div class="col-md-6">
                     <div class="mb-3">
                         <label class="form-label fw-semibold">Grup</label>
-                        <div class="form-control bg-light">{{ $participant->groupParticipants->group->nama ?? '-' }}</div>
+                        <div class="form-control bg-light">
+                            @forelse ($participant->groupParticipants as $groupParticipant)
+                                {{ $groupParticipant->group->nama }} -
+                            @empty
+                                
+                            @endforelse
+                        </div>
                     </div>
                     <div class="mb-3">
                         <label class="form-label fw-semibold">Dibuat Pada</label>

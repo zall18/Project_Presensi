@@ -2,7 +2,7 @@
       <!-- Sidebar scroll-->
       <div>
         <div class="brand-logo d-flex align-items-center justify-content-between">
-          <a href="./index.html" class="text-nowrap logo-img">
+          <a href="/dashboard" class="text-nowrap logo-img">
             <img src="{{ asset('images/profile/YPC.png') }}" width="60" alt="" class="m-auto" />
           </a>
           <div class="close-btn d-xl-none d-block sidebartoggler cursor-pointer" id="sidebarCollapse">
@@ -92,14 +92,16 @@
                 <span class="hide-menu">Waktu Libur</span>
               </a>
             </li>
-            <li class="sidebar-item">
-              <a class="sidebar-link" href="/device" aria-expanded="false">
-                <span>
-                  <i class="ti ti-square"></i>
-                </span>
-                <span class="hide-menu">Device</span>
-              </a>
-            </li>
+            @if (Auth::user()->level === 'admin')
+              <li class="sidebar-item">
+                <a class="sidebar-link" href="/device" aria-expanded="false">
+                  <span>
+                    <i class="ti ti-square"></i>
+                  </span>
+                  <span class="hide-menu">Device</span>
+                </a>
+              </li>
+            @endif
 
           </ul>
         </nav>

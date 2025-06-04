@@ -19,7 +19,7 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function() {
     return view('auth');
 })->name('login');
-Route::post('/auth', [AuthController::class, 'login'])->name('auth');
+Route::post('/login', [AuthController::class, 'login'])->name('auth.login');
 
 // Semua route di bawah hanya untuk user yang sudah login dan punya role admin/operator
 Route::middleware(['auth', 'checkRole:admin,operator'])->group(function () {
@@ -27,6 +27,8 @@ Route::middleware(['auth', 'checkRole:admin,operator'])->group(function () {
     Route::post('/auth', [AuthController::class, 'logout'])->name('logout');
 
     Route::get('/dashboard', [UserController::class, 'dashboard'])->name('dashboard');
+    Route::get('/me', [UserController::class, 'me'])->name('me');
+    Route::get('/me/update', [UserController::class, 'meUpdate'])->name('me.update');
     Route::resource('user', UserController::class);
 
     Route::get('/participant/import', [ParticipantsController::class, 'importView'])->name('participant.import');
@@ -67,4 +69,6 @@ Route::middleware(['auth', 'checkRole:admin,operator'])->group(function () {
 // Route device hanya untuk admin
 Route::middleware(['auth', 'checkRole:admin'])->group(function () {
     Route::resource('device', DeviceController::class);
+    Route::post('/verify-password', [DeviceController::class, 'verifyPassword'])->name('verify.password');
+
 });

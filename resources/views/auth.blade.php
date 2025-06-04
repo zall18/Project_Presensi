@@ -33,7 +33,7 @@
                           </ul>
                       </div>
                   @endif
-                <form method="POST" action="{{ route('auth') }}">
+                <form method="POST" action="{{ route('auth.login') }}">
                     @csrf
                   <div class="mb-3">
                     <label for="exampleInputEmail1" class="form-label">Email</label>

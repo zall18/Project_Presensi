@@ -10,6 +10,8 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\PresensiGroupExport;
+use App\Models\Device;
+use App\Models\WaktuLibur;
 use Illuminate\Support\Facades\Crypt;
 
 class PresensiController extends Controller
@@ -55,13 +57,48 @@ class PresensiController extends Controller
         return view('Managment.Presensi.show', compact('presensi'));
     }
 
-    public function store($id_kartu)
+    public function store(Request $request)
     {
-        $participant = Participant::where('id_kartu', $id_kartu)->with('jadwalParticipant')->first();
+
+        $device = Device::where('device_id', $request->id_device)->first();
+        if(!$device || $device->api_key != $request->api_key) {
+            return response()->json(['message' => 'Device not found']);
+        }
+
+        if($device->status === 'inactive') {
+            return response()->json(['message' => 'Device is inactive, please call admin to fix it']);
+        }
+
+        $participant = Participant::where('id_kartu', $request->id_kartu)->with('jadwalParticipant', 'groupParticipants')->first();
 
         if (!$participant) {
             return response()->json(['message' => 'Participant not found'], 404);
         }
+
+                // Get the current time and day
+        Carbon::setLocale('id');
+        $currentTime = Carbon::now();
+        $currentDate = $currentTime->translatedFormat(format: 'Y-m-d');
+        $currentDay = strtolower($currentTime->translatedFormat('l')); // This will return the day in Bahasa
+        $currentHour = $currentTime->translatedFormat(format: 'H:i:s');
+
+
+        $groupParticipants = $participant->groupParticipants;
+        foreach ($groupParticipants as $data) {
+            $group = Group::with('groupLiburs')->find($data->id_group);
+
+            foreach ($group->groupLiburs as $dataLibur) {
+                $waktuLibur = WaktuLibur::find($dataLibur->id_waktu_libur);
+
+                if ($currentDate >= $waktuLibur->tanggal_mulai && $currentDate <= $waktuLibur->tanggal_akhir) {
+                    return response()->json([
+                        'message' => 'Hari ini adalah hari libur: ' . $waktuLibur->nama_libur . ', tidak bisa presensi'
+                    ], 403);
+                }
+            }
+        }
+
+        
 
         $jadwalParticipant = $participant['jadwalParticipant'];
         if (!$jadwalParticipant) {
@@ -78,31 +115,28 @@ class PresensiController extends Controller
             return response()->json(['message' => 'Jam Kerja not found'], 404);
         }
 
-        // Get the current time and day
-        Carbon::setLocale('id');
-        $currentTime = Carbon::now();
-        $currentDay = strtolower($currentTime->translatedFormat('l')); // This will return the day in Bahasa
-        $currentHour = $currentTime->translatedFormat(format: 'H:i:s');
 
 
         // Check if the participant has already checked in today
         $existingAttendance = $participant->presensi()
             ->whereDate('created_at', Carbon::today())
             ->first();
+        // return response()->json($currentHour);
         if ($existingAttendance != null) {
-            if($currentTime > $jamKerja->jam_mulai_scan_keluar) {
+            if($currentHour < $jamKerja->jam_mulai_scan_keluar) {
                 return response()->json(['message' => 'Belum masuk jam scan keluar'], 422);
             }
 
             $participant->presensi()->update([
                 'waktu_keluar' => $currentTime,
+                'status_check_out' => true,
                 'updated_at' => $currentTime, // Set to current time for check-out
             ]);
             return response()->json([
-                'message' => 'Presensi berhasil',
-                'waktu_keluar' => $currentTime->format('H:i:s'),
+                'message' => 'Presensi Check Out Hari Ini',
+                'waktu_keluar' => $currentHour,
                 'participant' => $participant->nama,
-                'shift' => $jadwalParticipant->shift->nama_shift,
+                'shift' => $jadwalParticipant->shift->nama,
                 'updated_at' => $currentTime
             ], 200);
         }else{
@@ -114,44 +148,43 @@ class PresensiController extends Controller
                 return response()->json(['message' => 'Tidak ada jadwal untuk hari ini'], 422);
             }
 
-            if($currentTime < $jamKerja->jam_mulai_scan_masuk) {
+            if($currentHour < $jamKerja->jam_mulai_scan_masuk) {
                 return response()->json(['message' => 'Tidak dalam jam scan'], 422);
             }
 
-            // Check if the current time is within the working hours
-            $isWithinWorkingHours = $jamKerja->get()->contains(function ($jam) use ($currentHour) {
-                return $currentHour >= $jam->jam_masuk && $currentHour <= $jam->jam_pulang;
-            });
+            $toleransiMasuk = Carbon::parse($jamKerja->jam_masuk)->addMinutes($jamKerja->toleransi_terlambat)->translatedFormat('H:i:s');
 
-            if (!$isWithinWorkingHours) {
-                return response()->json(['message' => 'Tidak dalam jam kerja'], 422);
+            if ($currentHour > $toleransiMasuk){
+                $participant->presensi()->create([
+                    'id_participant' => $participant->id,
+                    'waktu_masuk' => $currentTime,
+                    'waktu_keluar' => $currentTime->addHours($jamKerja->toleransi_check_out),
+                    'id_device' => $device->id, 
+                    'id_shift' => $jadwalParticipant->shift->id,
+                    'status_terlambat' => true,
+                    'status_check_out' => false
+                ]);
+            } else {
+                $participant->presensi()->create([
+                    'id_participant' => $participant->id,
+                    'waktu_masuk' => $currentTime,
+                    'waktu_keluar' => $currentTime->addHours($jamKerja->toleransi_check_out),
+                    'id_device' => $device->id, 
+                    'id_shift' => $jadwalParticipant->shift->id,
+                    'status_terlambat' => false,
+                    'status_check_out' => false
+                ]);
             }
-
-            // Create the attendance record
-            $participant->presensi()->create([
-                'id_participant' => $participant->id,
-                'waktu_masuk' => $currentTime,
-                'waktu_keluar' => null, // Set to null for check-in
-                'id_device' => 1, // Assuming a default device ID, replace with actual logic if needed
-                'id_shift' => $jadwalParticipant->shift->id,
-                'updated_at' => null, // Set to null for check-in
-            ]);
+            
+            return response()->json([
+                'message' => 'Presensi Presensi Hari Ini',
+                'waktu_keluar' => $currentHour,
+                'participant' => $participant->nama,
+                'shift' => $jadwalParticipant->shift->nama,
+                'updated_at' => $currentTime
+            ], 200);
+            
         }
-
-
-
-        // // Return the current hour in JSON format
-        // return response()->json([
-        //     'message' => 'Presensi berhasil',
-        //     'waktu_masuk' => $currentTime->format('H:i:s'),
-        //     'participant' => $participant->nama,
-        //     'shift' => $jadwalParticipant->shift->nama_shift,
-        //     'updated_at' => null
-        // ]);
-        return response()->json($existingAttendance, 200);
-
-
-
     }
 
     // Show the edit form

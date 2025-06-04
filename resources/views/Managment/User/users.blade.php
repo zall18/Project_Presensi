@@ -7,9 +7,11 @@
             <h3 class="fw-semibold mb-1">User Management</h3>
             <p class="text-muted mb-0">Manage all registered users in the system</p>
         </div>
-        <a href="{{ route('user.create') }}" class="btn btn-success d-flex align-items-center">
-            <i class="ti ti-plus me-1"></i> Add New User
-        </a>
+        @if (Auth::user()->level === 'admin')
+            <a href="{{ route('user.create') }}" class="btn btn-success d-flex align-items-center">
+                <i class="ti ti-plus me-1"></i> Add New User
+            </a>
+        @endif
     </div>
 
     <div class="card shadow-sm border-0 overflow-hidden">
@@ -107,7 +109,9 @@
                                     @endif
                                 </a>
                             </th>
-                            <th class="text-end pe-4">Actions</th>
+                            @if (Auth::user()->level === 'admin')                                
+                                <th class="text-end pe-4">Actions</th>
+                            @endif
                         </tr>
                     </thead>
                     <tbody class="border-top-0">
@@ -132,25 +136,28 @@
                                     {{ ucfirst($user->level) }}
                                 </span>
                             </td>
-                            <td class="text-end pe-4">
-                                <div class="d-flex gap-2 justify-content-end">
-                                    <a href="{{ route('user.show', Crypt::encrypt($user->id)) }}" class="btn btn-sm btn-icon btn-outline-info rounded-3" data-bs-toggle="tooltip" title="View">
-                                        <i class="ti ti-eye"></i>
-                                    </a>
-                                    <a href="{{ route('user.edit', Crypt::encrypt($user->id)) }}" class="btn btn-sm btn-icon btn-outline-primary rounded-3" data-bs-toggle="tooltip" title="Edit">
-                                        <i class="ti ti-pencil"></i>
-                                    </a>
-                                    <form action="{{ route('user.destroy', Crypt::encrypt($user->id)) }}" method="POST" class="d-inline">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="btn btn-sm btn-icon btn-outline-danger rounded-3"
-                                                data-bs-toggle="tooltip" title="Delete"
-                                                onclick="return confirm('Are you sure you want to delete this user?')">
-                                            <i class="ti ti-trash"></i>
-                                        </button>
-                                    </form>
-                                </div>
-                            </td>
+                            @if (Auth::user()->level === 'admin')
+                                
+                                <td class="text-end pe-4">
+                                    <div class="d-flex gap-2 justify-content-end">
+                                        <a href="{{ route('user.show', Crypt::encrypt($user->id)) }}" class="btn btn-sm btn-icon btn-outline-info rounded-3" data-bs-toggle="tooltip" title="View">
+                                            <i class="ti ti-eye"></i>
+                                        </a>
+                                        <a href="{{ route('user.edit', Crypt::encrypt($user->id)) }}" class="btn btn-sm btn-icon btn-outline-primary rounded-3" data-bs-toggle="tooltip" title="Edit">
+                                            <i class="ti ti-pencil"></i>
+                                        </a>
+                                        <form action="{{ route('user.destroy', Crypt::encrypt($user->id)) }}" method="POST" class="d-inline">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="btn btn-sm btn-icon btn-outline-danger rounded-3"
+                                                    data-bs-toggle="tooltip" title="Delete"
+                                                    onclick="return confirm('Are you sure you want to delete this user?')">
+                                                <i class="ti ti-trash"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            @endif
                         </tr>
                         @empty
                         <tr>

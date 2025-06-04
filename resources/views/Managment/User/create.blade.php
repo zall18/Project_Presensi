@@ -11,6 +11,15 @@
             <i class="ti ti-arrow-left me-1"></i> Back to Users
         </a>
     </div>
+        @if ($errors->any())
+            <div class="alert alert-danger">
+                <ul class="mb-0">
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
 
     <div class="card shadow-sm border-0">
         <div class="card-body">
@@ -68,17 +77,20 @@
                             <small class="text-muted mt-1 d-block">Minimum 8 characters</small>
                         </div>
                     </div>
-
+                    
                     <!-- Confirm Password Field -->
                     <div class="col-md-6">
                         <div class="form-floating">
                             <input type="password"
-                                   class="form-control"
-                                   id="password_confirmation"
-                                   name="password_confirmation"
-                                   placeholder="Confirm Password"
-                                   required>
+                            class="form-control"
+                            id="password_confirmation"
+                            name="password_confirmation"
+                            placeholder="Confirm Password"
+                            required>
                             <label for="password_confirmation">Confirm Password</label>
+                            @error('password_confirmation')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
                         </div>
                     </div>
 
