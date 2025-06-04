@@ -56,7 +56,7 @@ class GroupsController extends Controller
             Alert::error('Gagal!', 'Group tidak ditemukan!');
             return redirect()->route('group.index');
         }
-        $participants = Participant::all();
+        $participants = Participant::paginate(15);
         $groupParticipantIds = Group::find($groupId)->participants()->pluck('participants.id')->toArray();
 
         return view('Managment.Group.groupParticipant.create', compact('group', 'participants', 'groupParticipantIds'));

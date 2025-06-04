@@ -21,10 +21,13 @@ class GroupParticipantController extends Controller
     // Store a new group participant
     public function store(Request $request)
     {
-        foreach ($request->participants as $id) {
+        // dd($request->all());
+        $ids = explode(',', $request->selected_participants);
+        foreach ($ids as $participantId) {
+            if (empty($participantId)) continue;
             GroupParticipant::create([
                 'id_group' => $request->group_id,
-                'id_participant' => $id,
+                'id_participant' => $participantId,
             ]);
         }
 

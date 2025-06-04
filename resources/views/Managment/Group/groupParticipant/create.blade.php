@@ -24,8 +24,9 @@
 
     <div class="card shadow-sm border-0">
         <div class="card-body">
-            <form action="{{ route('groupParticipant.store') }}" method="POST">
+            <form id="participant-form" action="{{ route('groupParticipant.store') }}" method="POST">
                 @csrf
+                <input type="hidden" name="selected_participants" id="selected_participants">
                 <input type="hidden" name="group_id" value="{{ $group->id }}">
                 <div class="table-responsive">
                     <table class="table table-bordered align-middle">
@@ -53,14 +54,13 @@
                                     <td>{{ $participant->alamat }}</td>
                                     <td class="text-center">
                                         <input type="checkbox"
-                                               value="{{ $participant->id }}"
-                                               @if(in_array($participant->id, $groupParticipantIds ?? []))
-                                                    checked disabled
-                                                    {{-- Don't include name so it won't be submitted --}}
-                                                @else
-                                                    name="participants[]"
-                                                @endif
-                                               >
+                                            class="participant-checkbox"
+                                            value="{{ $participant->id }}"
+                                            @if(in_array($participant->id, $groupParticipantIds ?? []))
+                                                checked disabled
+                                            @endif
+                                        >
+
                                     </td>
                                 </tr>
                             @empty
@@ -70,6 +70,22 @@
                             @endforelse
                         </tbody>
                     </table>
+                        @if($participants->hasPages())
+                            <div class="card-footer bg-transparent border-0 py-3">
+                                <div class="d-flex flex-column flex-md-row justify-content-between align-items-center">
+                                    <div class="mb-2 mb-md-0">
+                                        <p class="small text-muted mb-0">
+                                            Showing {{ $participants->firstItem() }} to {{ $participants->lastItem() }} of {{ $participants->total() }} entries
+                                        </p>
+                                    </div>
+                                    <nav aria-label="Page navigation">
+                                        <ul class="pagination pagination-sm mb-0">
+                                            {{ $participants->appends(request()->query())->onEachSide(1)->links() }}
+                                        </ul>
+                                    </nav>
+                                </div>
+                            </div>
+                        @endif
                 </div>
 
                 <div class="mt-4 pt-2 border-top">
@@ -96,5 +112,46 @@
             checkbox.checked = source.checked;
         });
     }
+
+    const STORAGE_KEY = 'selectedParticipants';
+
+    function saveSelectedToLocalStorage() {
+        const selected = Array.from(document.querySelectorAll('.participant-checkbox'))
+            .filter(cb => cb.checked && !cb.disabled)
+            .map(cb => cb.value);
+
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(selected));
+    }
+
+    function restoreCheckboxesFromLocalStorage() {
+        const selected = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+        console.log('Restore:', selected); // Debug
+
+        selected.forEach(id => {
+            const checkbox = document.querySelector(`.participant-checkbox[value="${id}"]`);
+            if (checkbox && !checkbox.disabled) checkbox.checked = true;
+        });
+    }
+
+    function updateHiddenInputBeforeSubmit() {
+        const selected = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+        console.log('Selected before submit:', selected); // Debug
+        document.getElementById('selected_participants').value = selected.join(',');
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        restoreCheckboxesFromLocalStorage();
+
+        document.querySelectorAll('.participant-checkbox').forEach(cb => {
+            cb.addEventListener('change', saveSelectedToLocalStorage);
+        });
+
+        const form = document.getElementById('participant-form');
+        form.addEventListener('submit', function (e) {
+            updateHiddenInputBeforeSubmit(); // Pastiin dipanggil
+            localStorage.removeItem(STORAGE_KEY);
+        });
+    });
+
 </script>
 @endsection
