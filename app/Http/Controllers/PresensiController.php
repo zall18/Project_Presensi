@@ -12,6 +12,7 @@ use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\PresensiGroupExport;
 use App\Models\Device;
 use App\Models\WaktuLibur;
+use Carbon\CarbonPeriod;
 use Illuminate\Support\Facades\Crypt;
 
 class PresensiController extends Controller
@@ -153,12 +154,13 @@ class PresensiController extends Controller
             }
 
             $toleransiMasuk = Carbon::parse($jamKerja->jam_masuk)->addMinutes($jamKerja->toleransi_terlambat)->translatedFormat('H:i:s');
+            $jamMasuk = Carbon::parse($jamKerja->jam_masuk);
 
             if ($currentHour > $toleransiMasuk){
                 $participant->presensi()->create([
                     'id_participant' => $participant->id,
                     'waktu_masuk' => $currentTime,
-                    'waktu_keluar' => $currentTime->addHours($jamKerja->toleransi_check_out),
+                    'waktu_keluar' => $jamMasuk->addHours($jamKerja->toleransi_check_out),
                     'id_device' => $device->id, 
                     'id_shift' => $jadwalParticipant->shift->id,
                     'status_terlambat' => true,
@@ -168,7 +170,7 @@ class PresensiController extends Controller
                 $participant->presensi()->create([
                     'id_participant' => $participant->id,
                     'waktu_masuk' => $currentTime,
-                    'waktu_keluar' => $currentTime->addHours($jamKerja->toleransi_check_out),
+                    'waktu_keluar' => $jamMasuk->addHours($jamKerja->toleransi_check_out),
                     'id_device' => $device->id, 
                     'id_shift' => $jadwalParticipant->shift->id,
                     'status_terlambat' => false,
@@ -229,7 +231,7 @@ class PresensiController extends Controller
             return response()->json('Group not found', 404);
         }
 
-        $totalDay = Presensi::with('shift');
+
         $presensi = Presensi::with('participant', 'shift')->whereHas('participant.groupParticipants.group', function($query) use ($group) {
             $query->where('id_group', $group->id);
         })->get();
@@ -237,24 +239,67 @@ class PresensiController extends Controller
         $today = Carbon::today();
         $totalHari = $shift->map(function ($date) use($today) {
             $tanggalMulai = Carbon::parse($date);
-            $totalDay = $tanggalMulai->diffInDays($today) + 1; // +1 jika ingin termasuk hari mulai
+            $totalDay = 0;
+
+             // Buat periode tanggal dari mulai sampai hari ini
+            $periode = CarbonPeriod::create($tanggalMulai, $today);
+
+            foreach ($periode as $day) {
+                // Cek apakah bukan hari Minggu
+                if (!$day->isSunday()) {
+                    $totalDay++;
+                }
+            }
             return $totalDay;
         });
+        $totalLibur = 0;
+        $WaktuLiburGroup = WaktuLibur::whereHas('groupLibur', function ($query) use($group) {
+            $query->where('id_group', $group->id);
+        })->get();
+        // return response()->json($WaktuLiburGroup);
+
+        foreach ($WaktuLiburGroup as $waktuLibur) {
+            $tanggalMulai = Carbon::parse($waktuLibur->tanggal_mulai);
+            $tanggalAkhir = Carbon::parse($waktuLibur->tanggal_akhir);
+
+            $diffDays = $tanggalMulai->diffInDays($tanggalAkhir) + 1;
+            $totalLibur += $diffDays;
+        }
 
 
 
-        $dataPresensi = $presensi->map(function($data, $index) use($totalHari, $presensi) {
+        $dataPresensi = $presensi->map(function($data, $index) use($totalHari, $presensi, $totalLibur) {
             $totalMasuk = $presensi->where('id_participant', $data->participant->id)->count();
             $totalTelat = $presensi->where('id_participant', $data->participant->id)->where('status_terlambat', true)->count();
             $totalTidakCO = $presensi->where('id_participant', $data->participant->id)->where('status_check_out')->where('status_check_out', false)->count();
+            $JamKerja = $presensi->where('id_participant', $data->participant->id)->map(function($dataPresensi) {
+                $waktuMasuk = $dataPresensi->waktu_masuk;
+                $waktuKeluar = $dataPresensi->waktu_keluar;
+                return [
+                    'waktu_masuk' => $waktuMasuk,
+                    'waktu_keluar' => $waktuKeluar
+                ];
+            });
+            $totalJamKerja = 0;
+            foreach($JamKerja as $jam) {
+                $jamMasuk = Carbon::parse($jam['waktu_masuk']);
+                $jamKeluar = Carbon::parse($jam['waktu_keluar']);
+
+                $diffMinutes = $jamMasuk->diffInMinutes($jamKeluar) / 60;
+
+                $totalJamKerja += $diffMinutes;
+            }
+
 
             return [
                 "participant" => $data->participant->nama,
                 "TotalHari" => $totalHari[$index],
                 "TotalMasuk" => $totalMasuk,
                 "totalTelat" => $totalTelat,
-                "totalTidakMasuk" => $totalHari[$index] - $totalMasuk,
-                "totalTidakCheckOut" => $totalTidakCO
+                "totalTidakMasuk" => $totalHari[$index] - $totalMasuk - $totalLibur,
+                "totalTidakCheckOut" => $totalTidakCO,
+                "totalJamKerja" => $totalJamKerja,
+                "totalLibur" => $totalLibur
             ];
         });
         // $startDate = $shift->tanggal_mulai;
@@ -273,4 +318,25 @@ class PresensiController extends Controller
 
         return Excel::download(new PresensiGroupExport($group->id, $group->nama), 'report_presensi_group_' . $group->nama . '.xlsx');
     }
+    public function ping($api_key, $id_device)
+    {
+        // Cek api_key valid
+        $device = Device::where('api_key', $api_key)
+                        ->where('device_id', $id_device)
+                        ->first();
+
+        if (!$device) {
+            return response()->json(['message' => 'Unauthorized'], 401);
+        }
+
+        // Update waktu terakhir ping
+        $device->status_koneksi = now();
+        $device->save();
+
+        return response()->json([
+            'message' => 'Ping received',
+            'status_koneksi' => $device->status_koneksi,
+        ]);
+    }
+
 }

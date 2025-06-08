@@ -71,7 +71,9 @@ class GroupsController extends Controller
             return redirect()->route('group.index');
         }
 
-        $participants = Group::with('participants')->find($groupId)->participants;
+        $participants = Participant::with('groupParticipants')->whereHas('groupParticipants', function($query) use($groupId) {
+            $query->where('id_group', $groupId);
+        })->paginate(15);
         return view('Managment.Group.groupParticipant.remove', compact('group', 'participants'));
 
     }

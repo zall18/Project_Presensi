@@ -7,7 +7,7 @@
             <h3 class="fw-semibold mb-1">Add Participants to Group</h3>
             <p class="text-muted mb-0">Select participants to add to this group</p>
         </div>
-        <a href="{{ route('group.show', Crypt::encrypt($group->id)) }}" class="btn btn-outline-secondary">
+        <a href="{{ route('group.show', Crypt::encrypt($group->id)) }}" class="btn btn-outline-secondary" onclick="cancelInputParticipant()">
             <i class="ti ti-arrow-left me-1"></i> Back to Group List
         </a>
     </div>
@@ -55,6 +55,7 @@
                                     <td class="text-center">
                                         <input type="checkbox"
                                             class="participant-checkbox"
+                                            id="participant"
                                             value="{{ $participant->id }}"
                                             @if(in_array($participant->id, $groupParticipantIds ?? []))
                                                 checked disabled
@@ -92,7 +93,7 @@
                     <button type="submit" class="btn btn-primary px-4">
                         <i class="ti ti-users-plus me-1"></i> Save Group Participants
                     </button>
-                    <a href="{{ route('groupParticipant.index') }}" class="btn btn-outline-secondary ms-2">
+                    <a href="{{ route('group.show', Crypt::encrypt($group->id)) }}" class="btn btn-outline-secondary ms-2" onclick="cancelInputParticipant()">
                         <i class="ti ti-reload me-1"></i> Cancel
                     </a>
                 </div>
@@ -102,25 +103,32 @@
 </div>
 
 <script>
-        function toggleAllCheckboxes(source) {
-        if (!source.checked) {
-            document.getElementById('all_checked').checked = false;
-
-        }
-        const checkboxes = document.querySelectorAll('input[name="participants[]"]');
+    function toggleAllCheckboxes(source) {
+        const checkboxes = document.querySelectorAll('.participant-checkbox');
         checkboxes.forEach(checkbox => {
-            checkbox.checked = source.checked;
+            if (!checkbox.disabled) checkbox.checked = source.checked;
         });
+        saveSelectedToLocalStorage(); // Simpan ke localStorage juga
     }
 
     const STORAGE_KEY = 'selectedParticipants';
 
     function saveSelectedToLocalStorage() {
-        const selected = Array.from(document.querySelectorAll('.participant-checkbox'))
+        const existing = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+        const current = Array.from(document.querySelectorAll('.participant-checkbox'))
             .filter(cb => cb.checked && !cb.disabled)
             .map(cb => cb.value);
 
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(selected));
+        // Hapus ID yang tampil di halaman sekarang dari existing
+        const currentPageIds = Array.from(document.querySelectorAll('.participant-checkbox'))
+            .map(cb => cb.value);
+
+        const filtered = existing.filter(id => !currentPageIds.includes(id));
+
+        // Gabungkan data dari localStorage lama (kecuali yang di halaman sekarang) + baru
+        const merged = [...new Set([...filtered, ...current])];
+
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(merged));
     }
 
     function restoreCheckboxesFromLocalStorage() {
@@ -152,6 +160,10 @@
             localStorage.removeItem(STORAGE_KEY);
         });
     });
+
+    function cancelInputParticipant() {
+        localStorage.removeItem(STORAGE_KEY);
+    }
 
 </script>
 @endsection

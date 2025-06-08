@@ -11,6 +11,11 @@ class Participant extends Model
 
     protected $guarded = [];
 
+    public function group()
+    {
+        return $this->hasMany(Group::class, 'id_participant');
+    }
+ 
     public function jadwalParticipant()
     {
         return $this->hasOne(JadwalParticipant::class, 'id_participant');

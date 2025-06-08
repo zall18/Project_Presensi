@@ -22,10 +22,31 @@ class DeviceController extends Controller
                 ->orWhere('device_id', 'like', "%{$search}%")
                 ->orWhere('lokasi', 'like', "%{$search}%")
                 ->paginate(10);
+
+            $devices->setCollection(
+                $devices->getCollection()->map(function ($device) {
+                    $device->status_koneksi = now()->diffInMinutes($device->status_koneksi) <= 10 ? 'Connect' : 'Inactive';
+                    return $device;
+                })
+            );
         } elseif ($request->sort && $request->direction) {
-            $devices = Device::orderBy($request->sort, $request->direction)->paginate(10);
+            $devices = Device::orderBy($request->sort, $request->direction)
+                ->paginate(10);
+
+            $devices->setCollection(
+                $devices->getCollection()->map(function ($device) {
+                    $device->status_koneksi = now()->diffInMinutes($device->status_koneksi) <= 10 ? 'Connect' : 'Inactive';
+                    return $device;
+                })
+            );
         } else {
             $devices = Device::paginate(10);
+            $devices->setCollection(
+                $devices->getCollection()->map(function ($device) {
+                    $device->status_koneksi = now()->diffInMinutes($device->status_koneksi) <= 10 ? 'Connect' : 'Inactive';
+                    return $device;
+                })
+            );
         }
 
         return view('Managment.Device.devices', compact('devices'));

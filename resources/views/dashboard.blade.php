@@ -113,7 +113,7 @@
                                 <th>Waktu Masuk</th>
                                 <th>Waktu Keluar</th>
                                 <th>Status Terlambat</th>
-                                <th>Device</th>
+                                <th>Status Check Out</th>
                             </tr>
                         </thead>
                         <tbody class="border-top-0">
@@ -122,8 +122,20 @@
                                 <td>{{ $presensi->participant->nama ?? "-"}}</td>
                                 <td>{{ $presensi->waktu_masuk }}</td>
                                 <td>{{ $presensi->waktu_keluar }}</td>
-                                <td>{{ $presensi->status_terlambat ? 'Terlambat' : "Tepat Waktu" }}</td>
-                                <td>{{ $presensi->device->nama }}</td>
+                                <td class="text-center">
+                                    @if($presensi->status_terlambat)
+                                      <span class="badge bg-success">Tepat Waktu</span>
+                                    @else
+                                      <span class="badge bg-danger">Terlambat</span>
+                                    @endif
+                                </td>
+                                <td class="text-center">
+                                  @if ($presensi->status_check_out)
+                                    <span class="badge bg-success">Sudah Check Out</span>
+                                  @else 
+                                    <span class="badge bg-danger">Belum Check Out</span>
+                                  @endif
+                                </td>
                             </tr>
                             @empty
                             <tr>

@@ -19,7 +19,7 @@
     </form>
     <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-4 gap-3">
         <div>
-            <h3 class="fw-semibold mb-1">Detail Sehift</h3>
+            <h3 class="fw-semibold mb-1">Detail Shift</h3>
             <p class="text-muted mb-0">Manage all detail shift in the system</p>
         </div>
         <a href="{{ route('shift.createDetailShift', Crypt::encrypt($shift->id)) }}" class="btn btn-success d-flex align-items-center">

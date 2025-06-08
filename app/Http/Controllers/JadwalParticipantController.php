@@ -31,7 +31,7 @@ class JadwalParticipantController extends Controller
         }
         $participants =  Participant::whereHas('jadwalParticipant', function ($query) use ($shift) {
             $query->where('id_shift', $shift->id);
-        })->get();
+        })->paginate(15);
         return view('Managment.JadwalParticipant.remove', compact('shift', 'participants'));
     }
 
@@ -47,11 +47,13 @@ class JadwalParticipantController extends Controller
 
         if($request->filter_grup === 'not'){
             $jadwalParticipants = JadwalParticipant::all();
-            $participants = Participant::whereNotIn('id', $jadwalParticipants->pluck('id'))->get();
+            $participants = Participant::whereNotIn('id', $jadwalParticipants->pluck('id'))->paginate(15);
         } else if($request->filter_grup && $request->filter_grup != 'all') {
-            $participants = Group::find($request->filter_grup)->participants;
+            $participants =  Participant::with('groupParticipants')->whereHas('groupParticipants', function($query) use($request) {
+                $query->where('id_group', $request->filter_grup);
+            })->paginate(15);
         }else{
-            $participants = Participant::all();
+            $participants = Participant::paginate(15);
         }
 
         if($request->search){
@@ -78,7 +80,8 @@ class JadwalParticipantController extends Controller
         }
         $validated = $validated->validated();
 
-        foreach ($request->participants as $participantId) {
+        $ids = explode(',', $request->selected_participants);
+        foreach ($ids as $participantId) {
             $existingJadwalParticipant = JadwalParticipant::where('id_participant', $participantId)
                 ->first();
             if ($existingJadwalParticipant) {
@@ -156,8 +159,8 @@ class JadwalParticipantController extends Controller
         }
 
         $validated = $validator->validated();
-
-        foreach ($request->participants as $participantId) {
+        $ids = explode(',', $request->selected_participants);
+        foreach ($ids as $participantId) {
             JadwalParticipant::where('id_shift', $validated['id_shift'])
                 ->where('id_participant', $participantId)
                 ->delete();

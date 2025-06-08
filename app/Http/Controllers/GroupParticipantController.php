@@ -80,8 +80,9 @@ class GroupParticipantController extends Controller
     // Delete a group participant
     public function destroy(Request $request)
     {
-        foreach ($request->participants as $id) {
-            GroupParticipant::where('id_participant', $id)
+        $ids = explode(',', $request->selected_participants);
+        foreach ($ids as $participantId)  {
+            GroupParticipant::where('id_participant', $participantId)
                 ->where('id_group', $request->group_id)->delete();
         }
         return redirect()->route('group.show', Crypt::encrypt($request->group_id))->with('success', 'GroupParticipant deleted successfully');

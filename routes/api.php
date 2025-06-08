@@ -27,32 +27,6 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
-});
-
-Route::apiResource('users', UserController::class);
-
-Route::apiResource('participants', ParticipantsController::class);
-Route::get('participants/id_kartu/{id_kartu}', [ParticipantsController::class, 'showByIdKartu']);
-
-Route::apiResource('groups', GroupsController::class);
-
-Route::apiResource('group-participants', GroupParticipantController::class);
-
-Route::apiResource('jam-kerja', JamKerjaController::class);
-
-Route::apiResource('shifts', ShiftController::class);
-
-Route::apiResource('detail-shifts', DetailShiftController::class)->except(['create']);
-Route::post('detail-shifts/{shift_id}', [DetailShiftController::class, 'store']);
-
-Route::apiResource('jadwal-participants', JadwalParticipantController::class)->except(['create']);
-
-Route::apiResource('devices', DeviceController::class);
-
-Route::apiResource('libur', WaktuLiburController::class);
-
-Route::apiResource('group-libur', GroupLiburController::class);
 
 Route::get('presensi/{api_key}/{id_device}/{id_kartu}', [PresensiController::class, 'store']);
+Route::get('ping/{api_key}/{id_device}', [PresensiController::class, 'ping']);

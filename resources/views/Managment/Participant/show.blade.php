@@ -68,16 +68,32 @@
                                 </th>
                                 <th>Waktu Masuk</th>
                                 <th>Waktu Keluar</th>
+                                <th>Status Terlambat</th>
+                                <th>Status Check Out</th>
                                 <th>Device</th>
                             </tr>
                         </thead>
                         <tbody class="border-top-0">
-                            @forelse ($presensis as $presensi)
+                            @forelse ($presensis as $key => $presensi)
                             <tr>
-                                <td class="ps-4 fw-semibold">{{ $presensi->id }}</td>
+                                <td class="ps-4 fw-semibold">{{ $key + 1 }}</td>
                                 <td>{{ $presensi->participant->nama ?? "-"}}</td>
                                 <td>{{ $presensi->waktu_masuk }}</td>
                                 <td>{{ $presensi->waktu_keluar }}</td>
+                                                                <td class="text-center">
+                                    @if($presensi->status_terlambat)
+                                      <span class="badge bg-success">Tepat Waktu</span>
+                                    @else
+                                      <span class="badge bg-danger">Terlambat</span>
+                                    @endif
+                                </td>
+                                <td class="text-center">
+                                  @if ($presensi->status_check_out)
+                                    <span class="badge bg-success">Sudah Check Out</span>
+                                  @else 
+                                    <span class="badge bg-danger">Belum Check Out</span>
+                                  @endif
+                                </td>
                                 <td>{{ $presensi->device->nama }}</td>
                             </tr>
                             @empty

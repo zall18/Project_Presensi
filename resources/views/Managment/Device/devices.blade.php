@@ -81,6 +81,7 @@
                             </th>
                             <th>Device ID</th>
                             <th>Lokasi</th>
+                            <th>Status Koneksi</th>
                             <th class="text-end pe-4">Actions</th>
                         </tr>
                     </thead>
@@ -91,6 +92,7 @@
                             <td>{{ $device->nama }}</td>
                             <td>{{ $device->device_id }}</td>
                             <td>{{ $device->lokasi }}</td>
+                            <td>{{ $device->status_koneksi }}</td>
                             <td class="text-end pe-4">
                                 <div class="d-flex gap-2 justify-content-end">
                                     <a href="{{ route('device.show', Crypt::encrypt($device->id)) }}" class="btn btn-sm btn-icon btn-outline-info rounded-3" data-bs-toggle="tooltip" title="View">
