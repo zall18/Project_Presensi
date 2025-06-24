@@ -25,7 +25,7 @@ class DeviceController extends Controller
 
             $devices->setCollection(
                 $devices->getCollection()->map(function ($device) {
-                    $device->status_koneksi = now()->diffInMinutes($device->status_koneksi) <= 10 ? 'Connect' : 'Inactive';
+                    $device->status_koneksi = now()->diffInMinutes($device->status_koneksi) <= 10 ? 'Connect' : 'Disconnect';
                     return $device;
                 })
             );
@@ -35,7 +35,7 @@ class DeviceController extends Controller
 
             $devices->setCollection(
                 $devices->getCollection()->map(function ($device) {
-                    $device->status_koneksi = now()->diffInMinutes($device->status_koneksi) <= 10 ? 'Connect' : 'Inactive';
+                    $device->status_koneksi = now()->diffInMinutes($device->status_koneksi) <= 10 ? 'Connect' : 'Disconnect';
                     return $device;
                 })
             );
@@ -43,7 +43,7 @@ class DeviceController extends Controller
             $devices = Device::paginate(10);
             $devices->setCollection(
                 $devices->getCollection()->map(function ($device) {
-                    $device->status_koneksi = now()->diffInMinutes($device->status_koneksi) <= 10 ? 'Connect' : 'Inactive';
+                    $device->status_koneksi = now()->diffInMinutes($device->status_koneksi) <= 10 ? 'Connect' : 'Disconnect';
                     return $device;
                 })
             );
@@ -84,6 +84,8 @@ class DeviceController extends Controller
     {
         $deviceId = Crypt::decrypt($id);
         $device = Device::find($deviceId);
+        $device->status_koneksi_badge = now()->diffInMinutes($device->status_koneksi) <= 10 ? 'Connect' : 'Disconnect';
+        
         if (!$device) {
             Alert::error('Gagal!', 'Device tidak ditemukan!');
             return redirect()->route('device.index')->withErrors(['message' => 'Device not found']);

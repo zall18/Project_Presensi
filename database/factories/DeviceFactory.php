@@ -23,6 +23,7 @@ class DeviceFactory extends Factory
             'lokasi' => $this->faker->address(),
             'api_key' => Str::random(32),
             'status' => $this->faker->randomElement(['active', 'inactive']),
+            'status_koneksi' => now()
         ];
     }
 }

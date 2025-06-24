@@ -49,6 +49,18 @@
                             </button>
                         </div>
                     </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Status Koneksi</label>
+                        @if($device->status_koneksi_badge == 'Connect')
+                            <span class="badge bg-success px-3 py-2 d-inline ms-2">Connect</span>
+                        @else
+                            <span class="badge bg-danger px-3 py-2 d-inline ms-2">Disconnect</span>
+                        @endif
+
+                        <div>
+                            <span class="form-control bg-light">Terakhir aktif : {{ $device->status_koneksi }}</span>
+                        </div>
+                    </div>
 
                 </div>
             </div>
