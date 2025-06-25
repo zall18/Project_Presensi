@@ -99,7 +99,7 @@ class PresensiController extends Controller
             }
         }
 
-        
+
 
         $jadwalParticipant = $participant['jadwalParticipant'];
         if (!$jadwalParticipant) {
@@ -161,7 +161,7 @@ class PresensiController extends Controller
                     'id_participant' => $participant->id,
                     'waktu_masuk' => $currentTime,
                     'waktu_keluar' => $jamMasuk->addHours($jamKerja->toleransi_check_out),
-                    'id_device' => $device->id, 
+                    'id_device' => $device->id,
                     'id_shift' => $jadwalParticipant->shift->id,
                     'status_terlambat' => true,
                     'status_check_out' => false
@@ -171,13 +171,13 @@ class PresensiController extends Controller
                     'id_participant' => $participant->id,
                     'waktu_masuk' => $currentTime,
                     'waktu_keluar' => $jamMasuk->addHours($jamKerja->toleransi_check_out),
-                    'id_device' => $device->id, 
+                    'id_device' => $device->id,
                     'id_shift' => $jadwalParticipant->shift->id,
                     'status_terlambat' => false,
                     'status_check_out' => false
                 ]);
             }
-            
+
             return response()->json([
                 'message' => 'Presensi Presensi Hari Ini',
                 'waktu_keluar' => $currentHour,
@@ -185,7 +185,7 @@ class PresensiController extends Controller
                 'shift' => $jadwalParticipant->shift->nama,
                 'updated_at' => $currentTime
             ], 200);
-            
+
         }
     }
 
@@ -337,6 +337,25 @@ class PresensiController extends Controller
             'message' => 'Ping received',
             'status_koneksi' => $device->status_koneksi,
         ]);
+    }
+
+    // API Function
+    public function getAllPresensi(Request $request) {
+        $perPage = $request->query('per_page', 10);
+        $data = Presensi::paginate($perPage);
+
+        return response()->json($data);
+    }
+
+    public function presensiExportApi($id)
+    {
+        $group = Group::find($id);
+
+        if(!$group) {
+            return response()->json(['message' => 'Group not found'], 404);
+        }
+
+        return Excel::download(new PresensiGroupExport($group->id, $group->nama), 'report_presensi_group_' . $group->nama . '.xlsx');
     }
 
 }

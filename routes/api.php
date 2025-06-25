@@ -30,3 +30,5 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('presensi/{api_key}/{id_device}/{id_kartu}', [PresensiController::class, 'store']);
 Route::get('ping/{api_key}/{id_device}', [PresensiController::class, 'ping']);
+Route::get('/export-report-presensi/{id}', [PresensiController::class, 'presensiExportApi']);
+Route::get('/presensis', [PresensiController::class, 'getAllPresensi']);
